@@ -13,3 +13,7 @@ List of tech we are considering / using
 
 To consider:
   * db4o
+
+= Tutorials ect =
+
+[http://www.eclipse.org/webtools/community/tutorials/BuildJ2EEWebApp/BuildJ2EEWebApp.html Tutorial on setting up eclipse for a new web project, I followed it to get our project going]
