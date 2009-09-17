@@ -17,3 +17,7 @@ To consider:
 = Tutorials ect =
 
 [http://www.eclipse.org/webtools/community/tutorials/BuildJ2EEWebApp/BuildJ2EEWebApp.html Tutorial on setting up eclipse for a new web project, I followed it to get our project going]
+
+Additional steps I had to take to get tomcat to launch from within eclipse:
+  *Tick the 'publish module contexts to spearate XML files' checkbox in the server conf page
+  *Install the [http://tomcat.apache.org/tomcat-6.0-doc/apr.html Tomcat apr]
