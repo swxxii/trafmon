@@ -1,0 +1,11 @@
+#summary Discussion of tech to use
+
+= Introduction =
+
+List of tech we are considering / using
+
+
+= Details =
+
+To consider:
+* db4o
