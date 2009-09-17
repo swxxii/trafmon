@@ -8,4 +8,4 @@ List of tech we are considering / using
 = Details =
 
 To consider:
-* db4o
+  * db4o
