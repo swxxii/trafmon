@@ -26,6 +26,8 @@ navigate to localhost:8080/trafmon in a browser
 
 The gods being willing, you have now got it up and running :)
 
+To commit/update, go to the 'team synchronization' perspective, click synchronize, select SVN, and then go from there. Make sure you dont just commit everything, just things you know you want to add/update, because if you let it it will upload all your personal machine dependent settings to screw the rest if us up.
+
 = Links =
 
 [http://www.eclipse.org/webtools/community/tutorials/BuildJ2EEWebApp/BuildJ2EEWebApp.html Tutorial on setting up eclipse for a new web project, I followed it to get our project going]
