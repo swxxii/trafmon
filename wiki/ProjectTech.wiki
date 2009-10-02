@@ -7,6 +7,8 @@ List of tech we are considering / using
   * [http://code.google.com/apis/maps/documentation/v3/ Google Maps API V3]
   * [http://code.google.com/p/iui/ iUi iPhone style GUI library]
   * [http://merged.ca/iphone/html5-geolocation Safari Mobile's support for W3C Geolocation API]
+  * [http://www.subtlysimple.com/?page_id=100 Using HTML Canvas to draw markers as polygons]
+
 
 
 = Details =
