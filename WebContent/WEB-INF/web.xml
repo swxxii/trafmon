@@ -19,4 +19,14 @@
     <servlet-name>SnoopServlet</servlet-name>
     <url-pattern>/SnoopServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Db4oServlet</display-name>
+    <servlet-name>Db4oServlet</servlet-name>
+    <servlet-class>au.com.trafmon.sample.Db4oServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Db4oServlet</servlet-name>
+    <url-pattern>/Db4oServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
