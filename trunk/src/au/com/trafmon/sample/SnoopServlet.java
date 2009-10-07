@@ -21,14 +21,14 @@ public class SnoopServlet extends HttpServlet {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String userAgent = req.getHeader("user-agent");
+		String userAgent = request.getHeader("user-agent");
 		String clientBrowser = "Not known!";
 		if (userAgent != null)
 			clientBrowser = userAgent;
-		req.setAttribute("client.browser", clientBrowser);
-		req.getRequestDispatcher("/showBrowser.jsp").forward(req, resp);
+		request.setAttribute("client.browser", clientBrowser);
+		request.getRequestDispatcher("/WEB-INF/showBrowser.jsp").forward(request, response);
 	}
 
 }
