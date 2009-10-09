@@ -1,0 +1,38 @@
+body {
+	margin: 20px auto;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+}
+
+h1 {
+	font-size: 18pt;
+	text-align: center;
+}
+
+p {
+	text-align: center;
+}
+
+hr {
+border: 0;
+color: #9E9E9E;
+background-color: #9E9E9E;
+height: 5px;
+width: 800px;
+text-align: left;
+}
+
+#map_canvas {
+	margin: 0 auto;
+	font-size: 14px;
+	text-align: center;
+	vertical-align: top;
+	width: 800px;
+	height: 600px;
+	border: 2px solid #aaa;
+}
+
+#menu {
+	text-align: center;
+	word-spacing: 5px;
+}
