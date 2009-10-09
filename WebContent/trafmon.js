@@ -13,17 +13,17 @@
  * Class: TrafMon
  */
 
-window.trafmon = {
+trafmon = {
 
 	/***************************************************************************
 	 * Constants/Defaults
 	 **************************************************************************/
-
+	
 	// Default map location (if geolocation fails)
-	DEFAULT_LAT : 133,
-	DEFAULT_LONG : 27,
-	DEFAULT_ZOOM : 3,
-	DEFAULT_ZOOM_SUCCESS : 14,
+	DEFAULT_LAT : -37.798985,
+	DEFAULT_LONG : 144.964685,
+	DEFAULT_ZOOM : 14,
+	DEFAULT_ZOOM_SUCCESS : 1,
 	DEFAULT_NAVI_CONTROL : google.maps.NavigationControlStyle.ANDROID,
 
 	/***************************************************************************
@@ -49,11 +49,24 @@ window.trafmon = {
 	 * Initialize the google maps api
 	 */
 	init_map : function() {
-
 		// set location
 		trafmon.initPosition();
 		// do browser detection
 		trafmon.detectBrowser();
+
+	},
+
+	/**
+	 * Initialize the google maps api (desktop version)
+	 */
+	desktopInit : function() {
+		// get map options object
+		var mapopts = trafmon.getMapOptions(true);
+		// instantiate the map
+		map = new google.maps.Map(document.getElementById("map_canvas"),
+				mapopts);
+		// make sure the map knows its size
+		google.maps.event.trigger(map, 'resize');
 
 	},
 
@@ -192,7 +205,7 @@ window.trafmon = {
 		// first time build the marker
 		if (!trafmon.myOverlay) {
 			var srcImage = 'images/blue_dot_circle.png';
-  			trafmon.myOverlay = new MyOverlay(myLatLng, srcImage, map);
+			trafmon.myOverlay = new MyOverlay(myLatLng, srcImage, map);
 		} else {
 			// change marker position on subsequent passes
 			trafmon.myOverlay.set_position(myLatLng);

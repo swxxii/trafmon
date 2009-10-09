@@ -1,19 +1,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>TrafMon</title>
-        </script>
-        <script type="application/x-javascript" src="utils.js">
-        </script>
-        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true">
-        </script>
-        <script type="text/javascript" src="trafmon.js">
-        </script>
-    </head>
-    <body onload="trafmon.mapPageShown();">
-	    <h1>trafmon</h1>
-
-        <div id="map_canvas" style="width:800px;height:600px">
-        </div>
-    </body>
+    <title>trafmon desktop</title>
+    </script>
+    <script type="application/x-javascript" src="utils.js">
+    </script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true">
+    </script>
+    <script type="text/javascript" src="trafmon.js">
+    </script>
+    <link rel="stylesheet" href="desktop.css" type="text/css" />
+</head>
+<body onload="trafmon.desktopInit();">
+    <h1>trafmon desktop</h1>
+    <p id="menu">
+    	<a href="index.html">home</a> | <a href="#" onclick="trafmon.desktopInit();">reset</a> | <a href="iphone.html">iphone</a>
+    </p>
+    <div id="map_canvas" style="width:800px;height:600px">
+    </div>
+</body>
 </html>
