@@ -1,25 +1,22 @@
 body {
 	margin: 20px auto;
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 15px;
-}
-
-h1 {
-	font-size: 18pt;
+	font-size: 16px;
 	text-align: center;
 }
 
-p {
+h1 {
+	font-size: 20pt;
 	text-align: center;
 }
 
 hr {
-border: 0;
-color: #9E9E9E;
-background-color: #9E9E9E;
-height: 5px;
-width: 800px;
-text-align: left;
+	border: 0;
+	color: #9E9E9E;
+	background-color: #9E9E9E;
+	height: 5px;
+	width: 800px;
+	text-align: left;
 }
 
 #map_canvas {
@@ -27,12 +24,34 @@ text-align: left;
 	font-size: 14px;
 	text-align: center;
 	vertical-align: top;
-	width: 800px;
-	height: 600px;
+	width: 804px;
+	height: 550px;
 	border: 2px solid #aaa;
 }
 
 #menu {
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+	width: 810px;
+}
+
+#menu td {
+	padding: 0;
+}
+
+.search {
+	text-align: left;
+	width: 270px;
+}
+
+.nav {
 	text-align: center;
 	word-spacing: 5px;
+	width: 270px;
+}
+
+.info {
+	text-align: right;
+	width: 270px;
 }

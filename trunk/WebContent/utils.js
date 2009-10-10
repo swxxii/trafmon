@@ -110,3 +110,27 @@ function unHideElement(id) {
 		elem.style.display = "inline";
 
 }
+
+/*
+ * initialise all the cleared counters (optional)
+ */
+var cleared = {
+	search : false
+};
+
+function clearOnce(id) {
+	if (!cleared.search) {
+		setVal('search', '');
+		cleared.search = true;
+	}
+}
+
+function checkEnter(event, callback) {
+	if (event.keyCode == 13) {
+		eval(callback);
+		return false;
+	} else {
+		return true;
+	}
+}
+
