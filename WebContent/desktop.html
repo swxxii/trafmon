@@ -13,10 +13,21 @@
 </head>
 <body onload="trafmon.desktopInit();">
     <h1>trafmon desktop</h1>
-    <p id="menu">
-    	<a href="index.html">home</a> | <a href="#" onclick="trafmon.desktopInit();">reset</a> | <a href="iphone.html">iphone</a>
-    </p>
-    <div id="map_canvas" style="width:800px;height:600px">
+    <table id="menu">
+        <tr>
+            <td class="search">
+                <input id="search" type="text" value="search" onfocus="clearOnce('search');" onkeydown="checkEnter(event,'trafmon.desktopGeoCode();')"/>
+            </td>
+            <td class="nav">
+                <a href="index.html">home</a>
+                | <a href="#" onclick="trafmon.desktopInit();">reset</a>
+                | <a href="iphone.html">iphone</a>
+            </td>
+            <td class="info">
+            </td>
+        </tr>
+    </table>
+    <div id="map_canvas">
     </div>
 </body>
 </html>

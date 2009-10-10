@@ -18,7 +18,7 @@ trafmon = {
 	/***************************************************************************
 	 * Constants/Defaults
 	 **************************************************************************/
-	
+
 	// Default map location (if geolocation fails)
 	DEFAULT_LAT : -37.798985,
 	DEFAULT_LONG : 144.964685,
@@ -62,6 +62,9 @@ trafmon = {
 	desktopInit : function() {
 		// get map options object
 		var mapopts = trafmon.getMapOptions(true);
+		// change controls
+		mapopts.mapTypeControlOptions.style = google.maps.MapTypeControlStyle.DEFAULT;
+		mapopts.navigationControlOptions.style = google.maps.NavigationControlStyle.DEFAULT;
 		// instantiate the map
 		map = new google.maps.Map(document.getElementById("map_canvas"),
 				mapopts);
@@ -212,6 +215,18 @@ trafmon = {
 		}
 		// center map view on every pass (this may be annoying)
 		map.set_center(myLatLng);
+	},
+
+	/***************************************************************************
+	 * METHODS: Geocoding
+	 **************************************************************************/
+
+	/**
+	 * Process geocoding request for query
+	 */
+	desktopGeoCode : function() {
+		query = getVal('search');
+		alert('you searched for ' + query);
 	},
 
 	/***************************************************************************
