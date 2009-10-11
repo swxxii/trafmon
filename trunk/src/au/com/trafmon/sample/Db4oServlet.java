@@ -1,8 +1,6 @@
 package au.com.trafmon.sample;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,65 +17,58 @@ import com.db4o.query.Predicate;
 public class Db4oServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	ObjectContainer db;
-	List<Pilot> pilots;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Db4oServlet() {
-        super();
-        db = Db4o.openFile("db4oTest.db4o");
-		pilots = new ArrayList<Pilot>();
-        createPilots();
-        storePilots();
-    }
 
-	private void storePilots() {
-
-		Iterator<Pilot> iter = pilots.iterator();
-		
-		while(iter.hasNext()){
-			db.store(iter.next());
-		}
-		
-		
-	}
-
-	private void createPilots() {
-		
-		Pilot pilot1=new Pilot("Michael Schumacher",100);
-		Pilot pilot2=new Pilot("Rubens Barrichello",99);
-		
-		pilots.add(pilot1);
-		pilots.add(pilot2);
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Db4oServlet() {
+		super();
+		db = Db4o.openFile("/tmp/pilots.db4o");
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String name = null;
-		
-		
-		List<Pilot> list = db.query(new Predicate<Pilot>() {
-			public boolean match(Pilot candidate) {
-				return candidate.getPoints() == 99;
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+
+		String to = request.getParameter("to");
+
+		if (to != null) {
+			if(to.equalsIgnoreCase("load")){
+				//We are headed for the 'load' page
+				List<Pilot> list = db.query(new Predicate<Pilot>() {
+					public boolean match(Pilot candidate) {
+						return true;
+					}
+				});
+
+				request.setAttribute("pilots", list);
+				request.getRequestDispatcher("/WEB-INF/db4oExampleLoad.jsp").forward(
+						request, response);
+				
+			}else{
+				//We should not be here!
 			}
-		});
-		
-		if(list.size() > 0){
-			name = list.get(0).getName();
+		} else {
+
+			//We are coming in for the first time
+			request.getRequestDispatcher("/WEB-INF/db4oExampleSave.jsp").forward(
+					request, response);
 		}
-		
-		request.setAttribute("pilot1.name", name);
-		request.getRequestDispatcher("/WEB-INF/db4oExample.jsp").forward(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+			String name = (String)request.getParameter("name");
+			db.store(new Pilot(name, 0));
+			request.getRequestDispatcher("/WEB-INF/db4oExampleSave.jsp").forward(
+					request, response);
 	}
 
 }
