@@ -7,7 +7,8 @@ List of tech we are considering / using
   * [http://code.google.com/apis/maps/documentation/v3/ Google Maps API V3]
   * [http://code.google.com/p/iui/ iUi iPhone style GUI library]
   * [http://merged.ca/iphone/html5-geolocation Safari Mobile's support for W3C Geolocation API]
-  * [http://www.subtlysimple.com/?page_id=100 Using HTML Canvas] to draw markers as polygons ([https://developer.mozilla.org/En/Drawing_Graphics_with_Canvas more])
+  * [http://www.movable-type.co.uk/scripts/latlong.html Calculate distance/bearing between points]
+
 
 
 
@@ -15,3 +16,4 @@ List of tech we are considering / using
 
 To consider:
   * db4o
+  * [http://www.subtlysimple.com/?page_id=100 Using HTML Canvas] to draw markers as polygons ([https://developer.mozilla.org/En/Drawing_Graphics_with_Canvas more])
