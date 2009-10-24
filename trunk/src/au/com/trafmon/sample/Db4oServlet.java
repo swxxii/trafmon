@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.com.trafmon.Util;
+
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.query.Predicate;
@@ -23,7 +25,7 @@ public class Db4oServlet extends HttpServlet {
 	 */
 	public Db4oServlet() {
 		super();
-		db = Db4o.openFile("/tmp/pilots.db4o");
+		db = Util.openDb();
 	}
 
 	/**
@@ -37,6 +39,7 @@ public class Db4oServlet extends HttpServlet {
 
 		if (to != null) {
 			if(to.equalsIgnoreCase("load")){
+				
 				//We are headed for the 'load' page
 				List<Pilot> list = db.query(new Predicate<Pilot>() {
 					public boolean match(Pilot candidate) {
