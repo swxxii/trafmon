@@ -9,6 +9,9 @@
  * Global Variables
  */
 
+// google maps API container
+var map = false;
+
 // init a global XmlHTTPRequest to use
 var xmlhttp = false;
 if (window.XMLHttpRequest) {
@@ -33,27 +36,34 @@ trafmon = {
 	DEFAULT_ZOOM : 14,
 	DEFAULT_ZOOM_SUCCESS : 14,
 	DEFAULT_NAVI_CONTROL : google.maps.NavigationControlStyle.ANDROID,
+	IMAGE_BASE_URL : 'images/',
+	MAP_CENTERED_ONCE : false,
 
 	/***************************************************************************
 	 * Class Variables
 	 **************************************************************************/
 
-	// Initialise the default position
+	// Initialise the default position. this is designed to replicate structure
+	// of position recieved from geolocation API.
+	// this does not like being initialised with variables hence the hard coding
 	position : {
 		coords : {
-			latitude : this.DEFAULT_LAT,
-			longitude : this.DEFAULT_LONG
+			latitude : -37.798985,
+			longitude : 144.964685
 		}
 	},
 
 	// marker for user's position
-	myMarker : false,
-	
+	USER_MARKER : false,
+
 	// location reporting enabled?
-	REPORT_LOCATION: true,
+	REPORT_LOCATION : true,
+
+	// list of markers (TrafficMarker objects)
+	markers : [],
 
 	/***************************************************************************
-	 * METHODS: Google Maps API
+	 * METHODS: Google Maps API Initialisation
 	 **************************************************************************/
 
 	/**
@@ -82,37 +92,54 @@ trafmon = {
 		// make sure the map knows its size
 		google.maps.event.trigger(map, 'resize');
 
+		// draw a test marker with fake data object
+		data = {
+			lat : -37.7989,
+			lng : 144.9646,
+			bearing : 50,
+			speed : 10,
+			tagged : false
+		}
+		// we only need to instantiate and it is drawn
+		trafmon.markers[0] = new TrafficMarker(data, map);
+
 	},
 
 	/**
-	 * The map needs to be refreshed after being hidden
+	 * Called when user clicks "start" and map page is shown
 	 */
 	mapPageShown : function() {
-		// there is no checkresize in v3! use this instead
+		// resize the map so it draws
 		google.maps.event.trigger(map, 'resize');
-		trafmon.updatePosition();
+		// start watching position
+		trafmon.watchPosition();
+
+		// draw a test marker with fake data object
+		// TODO if off screen when instantiated does not get drawn. need to
+		// attach a redraw to the boundsChanged event listener
+		data = {
+			lat : -37.7989,
+			lng : 144.9646,
+			bearing : 50,
+			speed : 10,
+			tagged : false
+		}
+		// we only need to instantiate and it is drawn
+		trafmon.markers[0] = new TrafficMarker(data, map);
+
 	},
 
 	/***************************************************************************
-	 * METHODS: Position
+	 * METHODS: Position updates
 	 **************************************************************************/
 
 	/**
-	 * Update Position : one-off
+	 * Init Position : called on load (note DIV will have 0x0 dimensions)
 	 */
 	initPosition : function() {
 		// get current location
 		navigator.geolocation.getCurrentPosition(trafmon.initPositionSuccess,
 				trafmon.initPositionFail);
-	},
-
-	/**
-	 * Update Position: continuous updating
-	 */
-	updatePosition : function() {
-		// watch current location
-		navigator.geolocation.watchPosition(trafmon.watchPositionSuccess,
-				trafmon.watchPositionFail);
 	},
 
 	/**
@@ -126,6 +153,8 @@ trafmon = {
 		// instantiate the map
 		map = new google.maps.Map(document.getElementById("map_canvas"),
 				mapopts);
+		// center map
+		map.set_center(trafmon.getPositionLatLng());
 
 	},
 	/**
@@ -139,18 +168,38 @@ trafmon = {
 		// instantiate the map
 		map = new google.maps.Map(document.getElementById("map_canvas"),
 				mapopts);
+		map.set_center(trafmon.getPositionLatLng());
+
 	},
 
 	/**
-	 * Watcher position success
+	 * Update Position: called when map page shown
+	 */
+	watchPosition : function() {
+		// watch current location
+		navigator.geolocation.watchPosition(trafmon.watchPositionSuccess,
+				trafmon.watchPositionFail);
+	},
+
+	/**
+	 * Watcher position success - this is called EVERY 500 ms or so when the
+	 * position updates, so don't want to do too much in here!
 	 */
 	watchPositionSuccess : function(position) {
+		// update internal position object
 		trafmon.setPosition(position);
-		trafmon.updateMyMarker();
+		if (!trafmon.MAP_CENTERED_ONCE) {
+			// center map
+			map.set_center(trafmon.getPositionLatLng());
+			trafmon.MAP_CENTERED_ONCE = true;
+		}
+		// redraw the user position marker
+		trafmon.updateUserMarker();
 	},
 
 	/**
-	 * Watcher position fail
+	 * Watcher position fail - called when could not get location. currently
+	 * does nothing
 	 */
 	watchPositionFail : function(err) {
 		// we can handle specific failures below
@@ -184,10 +233,9 @@ trafmon = {
 		toggled = elem.getAttribute('toggled')
 		if (toggled == 'true')
 			trafmon.REPORT_LOCATION = true;
-		else if(toggled == 'false')
+		else if (toggled == 'false')
 			trafmon.REPORT_LOCATION = false;
-			
-		
+
 	},
 
 	/***************************************************************************
@@ -195,51 +243,112 @@ trafmon = {
 	 **************************************************************************/
 
 	/**
-	 * Puts the familiar "glowing blue dot" marker
+	 * User position marker: draws user marker (recreates every time)
 	 */
-	updateMyMarker : function() {
-		var myLatLng = trafmon.getPositionLatLng();
-
-		// first time build the marker
-		if (!trafmon.myMarker) {
-
-			var image = new google.maps.MarkerImage(
-					'images/blue_dot_circle.png', new google.maps.Size(38, 38), // size
-					new google.maps.Point(0, 0), // origin
-					new google.maps.Point(19, 19) // anchor
-			);
-			trafmon.myMarker = new google.maps.Marker({
-						position : myLatLng,
-						map : map,
-						icon : image,
-						clickable : false,
-						draggable : false,
-						flat : true
-					});
-		} else {
-			// change marker position on subsequent passes
-			trafmon.myMarker.set_position(myLatLng);
+	updateUserMarker : function() {
+		// get a 'data point' for the user location so we can pass to the marker
+		// constructor
+		var data = trafmon.getUserDataPoint();
+		// remove if it exists: remove by marker.setMap(null)
+		if (trafmon.USER_MARKER != false) {
+			trafmon.USER_MARKER.setMap(null);
 		}
-		// center map view on every pass (this may be annoying)
-		map.set_center(myLatLng);
+		// create new at new position
+		trafmon.USER_MARKER = new TrafficMarker(data, map);
+
+		// center map view on every pass (this is annoying and should be
+		// user-triggered with a button)
+		// map.set_center(myLatLng);
 	},
 
-	/*
-	 * custom overlay
+	// // old version - not used
+	// updateMyMarker : function() {
+	// var myLatLng = trafmon.getPositionLatLng();
+	//
+	// // first time build the marker
+	// if (!trafmon.myMarker) {
+	//
+	// var image = new google.maps.MarkerImage(
+	// 'images/blue_dot_circle.png', new google.maps.Size(38, 38), // size
+	// new google.maps.Point(0, 0), // origin
+	// new google.maps.Point(19, 19) // anchor
+	// );
+	// trafmon.myMarker = new google.maps.Marker({
+	// position : myLatLng,
+	// map : map,
+	// icon : image,
+	// clickable : false,
+	// draggable : false,
+	// flat : true
+	// });
+	// } else {
+	// // change marker position on subsequent passes
+	// trafmon.myMarker.set_position(myLatLng);
+	// }
+	// // center map view on every pass (this may be annoying)
+	// map.set_center(myLatLng);
+	// },
+	/**
+	 * Gets the right marker image based on bearing and speed
+	 * 
+	 * @param {}
+	 *            bearing: in degrees (0-360), no minutes please!
+	 * @param {}
+	 *            speed: speed in km/hr
 	 */
-	updateMyOverlay : function() {
-		var myLatLng = trafmon.getPositionLatLng();
+	getMarkerImage : function(bearing, speed) {
+		// quantize the bearing to nearest marker interval
+		deg = trafmon.snapBearing(bearing);
+		// get the color
+		color = trafmon.getSpeedColor(speed);
+		// construct image URL
+		return trafmon.IMAGE_BASE_URL + color + deg + '.png';
+	},
 
-		// first time build the marker
-		if (!trafmon.myOverlay) {
-			var srcImage = 'images/blue_dot_circle.png';
-			trafmon.myOverlay = new MyOverlay(myLatLng, srcImage, map);
-		} else {
-			// change marker position on subsequent passes
-			trafmon.myOverlay.set_position(myLatLng);
-		}
-		// center map view on every pass (this may be annoying)
-		map.set_center(myLatLng);
+	/**
+	 * snaps a bearing to one of eight values indicating which marker to show We
+	 * probably need more resolution than this... PS. if you can think of a
+	 * neater way to implement this, feel free :-)
+	 * 
+	 * @param {}
+	 *            bearing
+	 */
+	snapBearing : function(bearing) {
+		if (bearing > 337.5 && bearing <= 22.5)
+			return 0;
+		if (bearing > 22.5 && bearing <= 67.5)
+			return 45;
+		if (bearing > 67.5 && bearing <= 112.5)
+			return 90;
+		if (bearing > 112.5 && bearing <= 157.5)
+			return 135;
+		if (bearing > 157.5 && bearing <= 202.5)
+			return 180;
+		if (bearing > 202.5 && bearing <= 247.5)
+			return 225;
+		if (bearing > 247.5 && bearing <= 292.5)
+			return 270;
+		if (bearing > 292.5 && bearing <= 337.5)
+			return 315;
+	},
+
+	/**
+	 * Converts a speed in km/h to the desired marker color. The actual values
+	 * are up for negotiation
+	 * 
+	 * @param {}
+	 *            speed: number in km/hr
+	 * @return {} a string representing the color
+	 */
+	getSpeedColor : function(speed) {
+		if (speed == 0)
+			return 'black';
+		if (speed > 0 && speed <= 20)
+			return 'red';
+		if (speed > 20 && speed <= 40)
+			return 'amber';
+		if (speed > 40)
+			return 'green';
 	},
 
 	/***************************************************************************
@@ -271,6 +380,20 @@ trafmon = {
 	getPositionLatLng : function() {
 		return new google.maps.LatLng(trafmon.position.coords.latitude,
 				trafmon.position.coords.longitude);
+	},
+
+	/**
+	 * gets the user position as a "data point"
+	 * 
+	 * @return {}
+	 */
+	getUserDataPoint : function() {
+		data = {
+			own : true,
+			lat : trafmon.position.coords.latitude,
+			lng : trafmon.position.coords.longitude
+		};
+		return data;
 	},
 
 	/**
@@ -344,107 +467,108 @@ trafmon = {
  * 
  ******************************************************************************/
 
-function MyOverlay(position, image, map) {
+/**
+ * Custom traffic speed marker
+ * 
+ * @param {}
+ *            data: object containing {position, speed, bearing, tag}
+ * @param {}
+ *            map: GMaps map object
+ */
+function TrafficMarker(data, map) {
+	// get position out of data object & set LatLng
+	this.latlng_ = new google.maps.LatLng(data.lat, data.lng);
+	// default image dimensions
+	this.imgDim_ = 11;
 
-	// Now initialize all properties.
-	this.position_ = position;
-	this.image_ = image;
-	this.map_ = map;
+	// if data point is the user's location and not a traffic point
+	if (data.own) {
+		this.image_ = trafmon.IMAGE_BASE_URL + 'beacon.png';
+		this.tagged_ = false;
+		this.imgDim_ = 17;
+	} else {
+		this.image_ = trafmon.getMarkerImage(data.bearing, data.speed);
+		this.tagged_ = data.tagged;
+	}
 
-	// We define a property to hold the image's
-	// div. We'll actually create this div
-	// upon receipt of the add() method so we'll
-	// leave it null for now.
-	this.div_ = null;
-
-	// Explicitly call setMap() on this overlay
+	// Once the LatLng and text are set, add the overlay to the map. This will
+	// trigger a call to panes_changed which should in turn call draw.
 	this.setMap(map);
 }
 
-MyOverlay.prototype = new google.maps.OverlayView();
+TrafficMarker.prototype = new google.maps.OverlayView();
 
-MyOverlay.prototype.onAdd = function() {
-
-	// Note: an overlay's receipt of onAdd() indicates that
-	// the map's panes are now available for attaching
-	// the overlay to the map via the DOM.
-
-	// Create the DIV and set some basic attributes.
-	var div = document.createElement('DIV');
-	div.style.border = "0px solid none";
-	div.style.position = "absolute";
-
-	// Create an IMG element and attach it to the DIV.
-	var img = document.createElement("img");
-	img.src = this.image_;
-	img.style.width = "100%";
-	img.style.height = "100%";
-	div.appendChild(img);
-
-	// Set the overlay's div_ property to this DIV
-	this.div_ = div;
-
-	// We add an overlay to a map via one of the map's panes.
-	// We'll add this overlay to the overlayImage pane.
-	var panes = this.getPanes();
-	panes.overlayImage.appendChild(div);
-}
-
-MyOverlay.prototype.draw = function() {
-
-	// Size and position the overlay. We use a southwest and northeast
-	// position of the overlay to peg it to the correct position and size.
-	// We need to retrieve the projection from this overlay to do this.
-	var overlayProjection = this.getProjection();
-
-	// Retrieve the southwest and northeast coordinates of this overlay
-	// in latlngs and convert them to pixels coordinates.
-	// We'll use these coordinates to resize the DIV.
-	var sw = overlayProjection
-			.fromLatLngToDivPixel(this.bounds_.getSouthWest());
-	var ne = overlayProjection
-			.fromLatLngToDivPixel(this.bounds_.getNorthEast());
-
-	// Resize the image's DIV to fit the indicated dimensions.
+TrafficMarker.prototype.draw = function() {
+	// Check if the div has been created.
 	var div = this.div_;
-	div.style.left = sw.x + 'px';
-	div.style.top = ne.y + 'px';
-	div.style.width = (ne.x - sw.x) + 'px';
-	div.style.height = (sw.y - ne.y) + 'px';
-}
+	if (!div) {
 
-MyOverlay.prototype.onRemove = function() {
-	this.div_.parentNode.removeChild(this.div_);
-	this.div_ = null;
-}
+		// TODO replace the DOM stuff with text???
 
-// Note that the visibility property must be a string enclosed in quotes
-MyOverlay.prototype.hide = function() {
+		// Create a overlay text DIV
+		div = this.div_ = document.createElement('DIV');
+		// set various attributes
+		div.style.border = "0px solid none";
+		div.style.position = "absolute";
+		div.style.padding = "0px";
+		// div.style.cursor = 'pointer'; // nb only affects desktop
+		div.style.width = this.imgDim_ + 'px';
+		div.style.height = this.imgDim_ + 'px';
+		div.style.background = 'url(' + this.image_ + ') no-repeat';
+
+		// create IMG inside DIV
+		// var img = document.createElement("IMG");
+		// img.src = this.image_;
+		// div.appendChild(img);
+
+		// TODO implement location tagging! only need this when object has
+		// location tag
+		// if (this.tagged_ != false) {
+		// google.maps.event.addDomListener(div, "click", function(event) {
+		// google.maps.event.trigger(this, "click");
+		// });
+		// }
+
+		// Add the overlay to the DOM
+		var panes = this.getPanes();
+		panes.overlayImage.appendChild(div);
+	}
+
+	// Position the overlay
+	var point = this.getProjection().fromLatLngToDivPixel(this.latlng_);
+	if (point) {
+		// subtract width/2 to center the image at LatLng
+		div.style.left = (point.x - Math.floor(this.imgDim_ / 2)) + 'px';
+		div.style.top = (point.y - Math.floor(this.imgDim_ / 2)) + 'px';
+	}
+};
+
+/**
+ * updates the marker with new position and redraws
+ * 
+ * @param {}
+ *            data
+ */
+TrafficMarker.prototype.update = function(data) {
+	this.latlng_ = new google.maps.LatLng(data.lat, data.lng);
+	// Position the overlay
+	var point = this.getProjection().fromLatLngToDivPixel(this.latlng_);
+	if (point) {
+		// subtract 5 to center the image
+		div.style.left = (point.x - 5) + 'px';
+		div.style.top = (point.y) - 5 + 'px';
+	}
+
+};
+
+TrafficMarker.prototype.onRemove = function() {
+	// Check if the overlay was on the map and needs to be removed.
 	if (this.div_) {
-		this.div_.style.visibility = "hidden";
+		this.div_.parentNode.removeChild(this.div_);
+		this.div_ = null;
 	}
-}
+};
 
-MyOverlay.prototype.show = function() {
-	if (this.div_) {
-		this.div_.style.visibility = "visible";
-	}
-}
-
-MyOverlay.prototype.toggle = function() {
-	if (this.div_) {
-		if (this.div_.style.visibility == "hidden") {
-			this.show();
-		} else {
-			this.hide();
-		}
-	}
-}
-
-MyOverlay.prototype.toggleDOM = function() {
-	if (this.getMap()) {
-		this.setMap(null);
-	} else {
-		this.setMap(this.map_);
-	}
-}
+TrafficMarker.prototype.getPosition = function() {
+	return this.latlng_;
+};

@@ -143,30 +143,29 @@
 	// ************************************************************************************
 
 	addEventListener("load", function(event) {
-				var page = iui.getSelectedPage();
-				var locPage = getPageFromLoc();
+		var page = iui.getSelectedPage();
+		var locPage = getPageFromLoc();
 
-				if (page)
-					iui.showPage(page);
+		if (page)
+			iui.showPage(page);
 
-				if (locPage && (locPage != page))
-					iui.showPage(locPage);
+		if (locPage && (locPage != page))
+			iui.showPage(locPage);
 
-				setTimeout(preloadImages, 0);
-				if (typeof window.onorientationchange == "object") {
-					window.onorientationchange = orientChangeHandler;
-					hasOrientationEvent = true;
-					setTimeout(orientChangeHandler, 0);
-				}
-				setTimeout(checkOrientAndLocation, 0);
-				checkTimer = setInterval(checkOrientAndLocation, 300);
+		setTimeout(preloadImages, 0);
+		if (typeof window.onorientationchange == "object") {
+			window.onorientationchange = orientChangeHandler;
+			hasOrientationEvent = true;
+			setTimeout(orientChangeHandler, 0);
+		}
+		setTimeout(checkOrientAndLocation, 0);
+		checkTimer = setInterval(checkOrientAndLocation, 300);
 
-				/**
-				 * trafmon
-				 */
-				window.trafmon.init_map();
-
-			}, false);
+			/**
+			 * trafmon
+			 */
+			// window.trafmon.init_map();
+		}, false);
 
 	addEventListener("unload", function(event) {
 				return;
@@ -260,6 +259,8 @@
 	function setOrientation(orient) {
 		document.body.setAttribute("orient", orient);
 		setTimeout(scrollTo, 100, 0, 1);
+		// trafmon- resize map div
+		// google.maps.event.trigger(map, 'resize');
 	}
 
 	function showDialog(page) {
@@ -329,11 +330,15 @@
 			fwdButton.style.display = "none";
 
 		/**
-		 * trafmon hack- tell map to 'redraw' essentially because when hidden, has a
-		 * size of zero
+		 * trafmon - this is where the map is created
 		 */
 		if (page.id == "map_canvas") {
-			window.trafmon.mapPageShown();
+			// create the map if not yet created
+			if (!map) {
+				trafmon.init_map();
+			}
+			// redraw map
+			trafmon.mapPageShown();
 		}
 
 	}
