@@ -115,8 +115,6 @@ trafmon = {
 		trafmon.watchPosition();
 
 		// draw a test marker with fake data object
-		// TODO if off screen when instantiated does not get drawn. need to
-		// attach a redraw to the boundsChanged event listener
 		data = {
 			lat : -37.7989,
 			lng : 144.9646,

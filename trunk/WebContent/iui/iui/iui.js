@@ -337,8 +337,8 @@
 			if (!map) {
 				trafmon.init_map();
 			}
-			// redraw map
-			trafmon.mapPageShown();
+			// redraw map (fairly hefty delay to give map a chance to load)
+			setTimeout(trafmon.mapPageShown, 1500);
 		}
 
 	}
