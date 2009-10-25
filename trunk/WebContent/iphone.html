@@ -22,11 +22,10 @@
             <a id="fwdButton" class="button" href="#"></a>
         </div>
         <div id="home" title="Home" class="panel" selected="true" fwdtitle="Start" fwdhref="#map_canvas">
-            <h1>Welcome to TrafMon!</h1>
+            <!--<h1>Welcome to TrafMon!</h1>
             <p>
-                Please select your startup options.
-            </p>
-            <h2>I'm Travelling By:</h2>
+            Please select your startup options.
+            </p>--><h2>I'm Travelling By</h2>
             <fieldset>
                 <div class="row" onclick="checkRadio('report_layer_car');hideElement('loc_tag_opts');">
                     <label>
@@ -42,16 +41,25 @@
                 </div>
             </fieldset>
             <div id="loc_tag_opts">
-                <h2>Optional Location Tagging:</h2>
+                <h2>Tag Your Location (optional)</h2>
                 <fieldset>
                     <div class="row">
                         <input class="wide" type="text" name="movie" value="" />
                     </div>
                 </fieldset>
-                <p>
-                    Use this to tell others what service you're on, e.g. "No. 401 bus". 
-                </p>
-            </div>
+            </div><h2>Contribute</h2>
+            <fieldset>
+                <div class="row">
+                    <label>
+                        Report Location
+                    </label>
+                    <div class="toggle" onclick="trafmon.toggleReporting();" toggled="true" id="report_loc">
+                        <span class="thumb"></span>
+                        <span class="toggleOn">ON</span>
+                        <span class="toggleOff">OFF</span>
+                    </div>
+                </div>
+            </fieldset>
         </div>
         <div id="map_canvas" title="Map" fwdtitle="Options" fwdhref="#options">
         </div>
@@ -102,10 +110,12 @@
             </fieldset>
         </div>
         <div id="about" title="About" class="panel">
-            <p>This is the about page.</p>
-			<p><a href="#map_canvas">Back to map.</a></p>
-			
-			
+            <p>
+                This is the about page.
+            </p>
+            <p>
+                <a href="#map_canvas">Back to map.</a>
+            </p>
         </div>
     </body>
 </html>
