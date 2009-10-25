@@ -5,6 +5,8 @@ body {
 	
 	/* disable font resizing */
 	-webkit-text-size-adjust: none; 
+	
+	background: #e4e3df;
 }
 
 body[class="portrait"] 
@@ -37,7 +39,8 @@ white-space:nowrap;
 	margin: 0 auto;
 	font-size:14px;
 	text-align:center;
-	vertical-align:top;
+	vertical-align:middle;
+	background: #e4e3df;
 }
 
 img.loading {

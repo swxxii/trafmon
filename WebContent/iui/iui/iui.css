@@ -23,7 +23,7 @@ body > *:not(.toolbar) {
     -webkit-transform: translateX(0%);
 }
 
-body[orient="landscape"] > *:not(.toolbar) {
+body[orient="landscape"] > #map*:not(.toolbar) {
     min-height: 268px;
 }
 
