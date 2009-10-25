@@ -9,6 +9,14 @@
  * Global Variables
  */
 
+// init a global XmlHTTPRequest to use
+var xmlhttp = false;
+if (window.XMLHttpRequest) {
+	xmlhttp = new XMLHttpRequest();
+} else if (window.ActiveXObject) {
+	xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+}
+
 /*
  * Class: TrafMon
  */
@@ -23,7 +31,7 @@ trafmon = {
 	DEFAULT_LAT : -37.798985,
 	DEFAULT_LONG : 144.964685,
 	DEFAULT_ZOOM : 14,
-	DEFAULT_ZOOM_SUCCESS : 1,
+	DEFAULT_ZOOM_SUCCESS : 14,
 	DEFAULT_NAVI_CONTROL : google.maps.NavigationControlStyle.ANDROID,
 
 	/***************************************************************************
@@ -40,6 +48,9 @@ trafmon = {
 
 	// marker for user's position
 	myMarker : false,
+	
+	// location reporting enabled?
+	REPORT_LOCATION: true,
 
 	/***************************************************************************
 	 * METHODS: Google Maps API
@@ -163,6 +174,20 @@ trafmon = {
 		// document.getElementById('info').innerHTML = msg;
 
 		return true;
+	},
+
+	/**
+	 * toggle option to send location
+	 */
+	toggleReporting : function() {
+		elem = document.getElementById('report_loc');
+		toggled = elem.getAttribute('toggled')
+		if (toggled == 'true')
+			trafmon.REPORT_LOCATION = true;
+		else if(toggled == 'false')
+			trafmon.REPORT_LOCATION = false;
+			
+		
 	},
 
 	/***************************************************************************
