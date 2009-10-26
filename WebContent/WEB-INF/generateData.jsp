@@ -11,6 +11,7 @@ Please select the data you want to generate:
 
 <form name="input" method="post" action="DataGenerator">
 	<input type="hidden" name="data" value="melbUni"/>
+ 	<input type="hidden" name="operation" value="create"/><br/>
 	<input type="submit" value="Melb Uni Data" />
 </form>
 

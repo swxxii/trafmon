@@ -11,7 +11,9 @@
 <body>
 
 <%
-	DataPointSet points = (DataPointSet) request.getAttribute("points");
+	DataPointSet points = null;
+	if ((points = (DataPointSet) request.getAttribute("points")) != null) {
+		if (points.getDataPoints() != null) {
 %>
 <table border="1">
 	<tr>
@@ -23,13 +25,19 @@
 	<%
 		List<DataPoint> pointL = points.getDataPoints();
 
-		for (DataPoint point : pointL) {
-			out.println("<tr>");
-			out.println("<td>" + point.getLat() + "</td>");
-			out.println("<td>" + point.getLng() + "</td>");
-			out.println("<td>" + point.getSpeed() + "</td>");
-			out.println("<td>" + point.getDate() + "</td>");
-			out.println("</tr>");
+				for (DataPoint point : pointL) {
+					out.println("<tr>");
+					out.println("<td>" + point.getLat() + "</td>");
+					out.println("<td>" + point.getLng() + "</td>");
+					out.println("<td>" + point.getSpeed() + "</td>");
+					out.println("<td>" + point.getDate() + "</td>");
+					out.println("</tr>");
+				}
+			} else {
+				out.println("There is currently no data in the database");
+			}
+		} else {
+			out.println("There is currently no data in the database");
 		}
 	%>
 </table>
