@@ -12,13 +12,6 @@
 // google maps API container
 var map = false;
 
-// init a global XmlHTTPRequest to use
-var xmlhttp = false;
-if (window.XMLHttpRequest) {
-	xmlhttp = new XMLHttpRequest();
-} else if (window.ActiveXObject) {
-	xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-}
 
 /*
  * Class: TrafMon
@@ -74,7 +67,7 @@ trafmon = {
 		trafmon.initPosition();
 		// do browser detection
 		trafmon.detectBrowser();
-		
+
 	},
 
 	/**
@@ -92,18 +85,8 @@ trafmon = {
 		// make sure the map knows its size
 		google.maps.event.trigger(map, 'resize');
 
-		trafmon.setListeners();
-
-		// draw a test marker with fake data object
-		data = {
-			lat : -37.7989,
-			lng : 144.9646,
-			bearing : 50,
-			speed : 10,
-			tagged : false
-		}
-		// we only need to instantiate and it is drawn
-		trafmon.markers[0] = new TrafficMarker(data, map);
+		// finished initialisation
+		trafmon.commonMain();
 
 	},
 
@@ -116,17 +99,76 @@ trafmon = {
 		// start watching position
 		trafmon.watchPosition();
 
-		// draw a test marker with fake data object
-		data = {
-			lat : -37.7989,
-			lng : 144.9646,
-			bearing : 50,
-			speed : 10,
-			tagged : false
-		}
-		// we only need to instantiate and it is drawn
-		trafmon.markers[0] = new TrafficMarker(data, map);
+		// finished initialisation
+		trafmon.commonMain();
 
+	},
+
+	/***************************************************************************
+	 * Common Main Method:
+	 * 
+	 * runs on both iPhone and desktop versions once initialised
+	 * 
+	 **************************************************************************/
+	commonMain : function() {
+
+		// turn on event listeners
+		trafmon.setListeners();
+
+		// test
+		//datas1 = ajaxRequest('data.json','');
+		
+		
+		datas = [{
+					'lat' : -37.80586845802654,
+					'lng' : 144.9630971322632,
+					'bearing' : 5,
+					'speed' : 40
+				}, {
+					'lat' : -37.804342623659004,
+					'lng' : 144.96335462432862,
+					'bearing' : 5,
+					'speed' : 40
+				}, {
+					'lat' : -37.80295239156705,
+					'lng' : 144.9635692010498,
+					'bearing' : 5,
+					'speed' : 40
+				}, {
+					'lat' : -37.80129086035017,
+					'lng' : 144.96382669311524,
+					'bearing' : 5,
+					'speed' : 40
+				}, {
+					'lat' : -37.80003620996976,
+					'lng' : 144.9641271005249,
+					'bearing' : 5,
+					'speed' : 40
+				}, {
+					'lat' : -37.79844243416238,
+					'lng' : 144.96442750793457,
+					'bearing' : 5,
+					'speed' : 40
+				}, {
+					'lat' : -37.79671297895897,
+					'lng' : 144.96464208465576,
+					'bearing' : 5,
+					'speed' : 40
+				}, {
+					'lat' : -37.79491565908105,
+					'lng' : 144.96494249206543,
+					'bearing' : 5,
+					'speed' : 40
+				}, {
+					'lat' : -37.79355916229501,
+					'lng' : 144.96477083068848,
+					'bearing' : 5,
+					'speed' : 40
+				}];
+
+		for (i = 0; i < datas.length; i++) {
+			trafmon.markers[i] = new TrafficMarker(datas[i], map);
+		}
 	},
 
 	/**
@@ -138,14 +180,13 @@ trafmon = {
 			return false;
 
 		/*
-		 * Click event: 
+		 * Click event: user clicks anywhere on the map
 		 */
 		google.maps.event.addListener(map, 'click', function(event) {
-					point = event.latLng;
-					alert(point);
+					trafmon.listenerClick(event);
 				});
 		/*
-		 * Bounds-changed - redraw markers
+		 * Bounds-changed
 		 * 
 		 * NOTE! 'bounds_changed' is triggered way too often. Google are awesome
 		 * and added an 'idle' event which fires after the map hasn't moved for
@@ -160,14 +201,31 @@ trafmon = {
 
 	},
 
+	/**
+	 * Bounds changed event listener
+	 */
 	listenerBoundsChanged : function() {
 		// get new bounds
 		bounds = map.getBounds();
 		ne = bounds.getNorthEast();
 		sw = bounds.getSouthWest();
 		// do stuff
-		alert('NE: ' + ne + ' SW:' + sw);
+		// alert('NE: ' + ne + ' SW:' + sw);
+	},
 
+	/**
+	 * Click event listener method
+	 * 
+	 * @param {}
+	 *            event: google.maps.MouseClick event
+	 */
+	listenerClick : function(event) {
+		point = event.latLng;
+		// alert(point);
+		data = "{ 'lat': " + point.lat() + ", 'lng': " + point.lng()
+				+ ", 'bearing': 5,'speed':40}, ";
+		txt = getVal('debug');
+		setVal('debug', txt + data);
 	},
 
 	/***************************************************************************
@@ -196,8 +254,9 @@ trafmon = {
 				mapopts);
 		// center map
 		map.set_center(trafmon.getPositionLatLng());
-		
-		trafmon.setListeners();
+
+		// finished initialisation
+		trafmon.commonMain();
 
 	},
 	/**
@@ -212,8 +271,9 @@ trafmon = {
 		map = new google.maps.Map(document.getElementById("map_canvas"),
 				mapopts);
 		map.set_center(trafmon.getPositionLatLng());
-		
-		trafmon.setListeners();
+
+		// finished initialisation
+		trafmon.commonMain();
 
 	},
 
@@ -359,7 +419,9 @@ trafmon = {
 	 *            bearing
 	 */
 	snapBearing : function(bearing) {
-		if (bearing > 337.5 && bearing <= 22.5)
+		if (bearing > 337.5 && bearing <= 360)
+			return 0;
+		if (bearing >= 0 && bearing <= 22.5)
 			return 0;
 		if (bearing > 22.5 && bearing <= 67.5)
 			return 45;
@@ -386,6 +448,7 @@ trafmon = {
 	 * @return {} a string representing the color
 	 */
 	getSpeedColor : function(speed) {
+		return 'red';
 		if (speed == 0)
 			return 'black';
 		if (speed > 0 && speed <= 20)
