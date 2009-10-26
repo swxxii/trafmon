@@ -46,7 +46,13 @@ public class DataGenerator extends HttpServlet {
 		String operation = request.getParameter("operation");
 
 		if(operation.equalsIgnoreCase("delete")){
-			Boolean status = Util.deleteDB();
+			Boolean status;
+
+			if((status = Util.deleteDB()) == true){
+				System.out.println("File deleted.");
+			}else{
+				System.out.println("Deletion failed.");
+			}
 
 			request.getRequestDispatcher("/WEB-INF/showData.jsp").forward(request, response);
 
