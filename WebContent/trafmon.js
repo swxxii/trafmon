@@ -74,7 +74,7 @@ trafmon = {
 		trafmon.initPosition();
 		// do browser detection
 		trafmon.detectBrowser();
-
+		
 	},
 
 	/**
@@ -91,6 +91,8 @@ trafmon = {
 				mapopts);
 		// make sure the map knows its size
 		google.maps.event.trigger(map, 'resize');
+
+		trafmon.setListeners();
 
 		// draw a test marker with fake data object
 		data = {
@@ -127,6 +129,47 @@ trafmon = {
 
 	},
 
+	/**
+	 * GMaps API Event Listeners
+	 */
+	setListeners : function() {
+		// if for some reason, map is null, abort
+		if (!map)
+			return false;
+
+		/*
+		 * Click event: 
+		 */
+		google.maps.event.addListener(map, 'click', function(event) {
+					point = event.latLng;
+					alert(point);
+				});
+		/*
+		 * Bounds-changed - redraw markers
+		 * 
+		 * NOTE! 'bounds_changed' is triggered way too often. Google are awesome
+		 * and added an 'idle' event which fires after the map hasn't moved for
+		 * a bit. 'idle' fires even if the (desktop) user is still dragging but
+		 * has stopped. Also fires once after initial load.
+		 */
+		google.maps.event.addListener(map, 'idle', function() {
+					// fires immediately at drag or zoom end so still need
+					// some delay. 333 seems good after experiments
+					setTimeout(trafmon.listenerBoundsChanged, 333);
+				});
+
+	},
+
+	listenerBoundsChanged : function() {
+		// get new bounds
+		bounds = map.getBounds();
+		ne = bounds.getNorthEast();
+		sw = bounds.getSouthWest();
+		// do stuff
+		alert('NE: ' + ne + ' SW:' + sw);
+
+	},
+
 	/***************************************************************************
 	 * METHODS: Position updates
 	 **************************************************************************/
@@ -153,6 +196,8 @@ trafmon = {
 				mapopts);
 		// center map
 		map.set_center(trafmon.getPositionLatLng());
+		
+		trafmon.setListeners();
 
 	},
 	/**
@@ -167,6 +212,8 @@ trafmon = {
 		map = new google.maps.Map(document.getElementById("map_canvas"),
 				mapopts);
 		map.set_center(trafmon.getPositionLatLng());
+		
+		trafmon.setListeners();
 
 	},
 
@@ -488,6 +535,8 @@ function TrafficMarker(data, map) {
 		this.image_ = trafmon.getMarkerImage(data.bearing, data.speed);
 		this.tagged_ = data.tagged;
 	}
+
+	// disable clicking and dragging (TODO: how?)
 
 	// Once the LatLng and text are set, add the overlay to the map. This will
 	// trigger a call to panes_changed which should in turn call draw.
