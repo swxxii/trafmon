@@ -31,6 +31,8 @@ function setVal(id, val) {
 	tagname = new String(elem.tagName).toUpperCase();
 	switch (tagname) { // Note: use CAPS for tag names
 		case 'SPAN' :
+		case 'DIV' :
+		case 'TEXTAREA' :
 			elem.innerHTML = val;
 			return true;
 			break;
@@ -38,15 +40,7 @@ function setVal(id, val) {
 			elem.value = val;
 			return true;
 			break;
-		case 'TEXTAREA' :
-			elem.innerHTML = val;
-			return true;
-			break;
 		default :
-			/*
-			 * old code if(elem.hasAttribute("value")) { elem.value = val;
-			 * return true; } else return false;
-			 */
 			return false;
 			break;
 	}
@@ -60,6 +54,8 @@ function getVal(id) {
 	tagname = new String(elem.tagName).toUpperCase();
 	switch (tagname) { // Note: use CAPS for tag names
 		case 'SPAN' :
+		case 'DIV' :
+		case 'TEXTAREA' :
 			return elem.innerHTML;
 			break;
 		case 'INPUT' :
@@ -69,9 +65,6 @@ function getVal(id) {
 			indx = elem.selectedIndex;
 			optelem = elem.options[indx];
 			return optelem.id;
-			break;
-		case 'TEXTAREA' :
-			return elem.innerHTML;
 			break;
 		default :
 			return false;
@@ -177,9 +170,18 @@ function clearCookie(name) {
 	setCookie(name, '', -1);
 }
 
+/*
+ * init a global XmlHTTPRequest to use
+ */
+var xmlhttp = false;
+if (window.XMLHttpRequest) {
+	xmlhttp = new XMLHttpRequest();
+} else if (window.ActiveXObject) {
+	xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+}
+
 /**
- * Example AJAX request function - unfortunately i think we need to copy this
- * each time
+ * Example AJAX request function
  * 
  * @param {}
  *            destination URL
@@ -194,12 +196,20 @@ function ajaxRequest(destination, params) {
 				"application/x-www-form-urlencoded");
 		xmlhttp.onreadystatechange = function() {
 			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-				data = xmlhttp.responseText;
 				// code here runs when request complete
+				data = xmlhttp.responseText;
 			}
 		};
 		xmlhttp.send(params);
 	}
+	return data;
+}
+
+function jsonRequest(dest, params) {
+	data = ajaxRequest(dest, params);
+	if (data)
+		return JSON.parse(data);
+	return false;
 }
 
 function iPhoneRedirect(url) {
