@@ -2,6 +2,7 @@ package au.com.trafmon.sample;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -64,8 +65,8 @@ public class DataGenerator extends HttpServlet {
 				String type = (String)request.getParameter("data");
 
 				if(type.equals("melbUni")){
-					DataPoint dp1 = new DataPoint(-37.800098, 144.961077, 5, new Date());
-					DataPoint dp2 = new DataPoint(-37.800013, 144.960154, 4, new Date());
+					DataPoint dp1 = new DataPoint(-37.800098, 144.961077, 1, 5, new GregorianCalendar());
+					DataPoint dp2 = new DataPoint(-37.800013, 144.960154, 2, 4, new GregorianCalendar());
 					db.store(dp1);
 					db.store(dp2);
 				}

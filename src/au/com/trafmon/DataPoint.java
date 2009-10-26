@@ -1,20 +1,23 @@
 package au.com.trafmon;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class DataPoint {
 	
 	private double lat;
 	private double lng;
+	private int bearing;
 	private double speed;
-	private Date date;
+	private GregorianCalendar cal;
 	
-	public DataPoint(double lat, double lng, double speed, Date date) {
+	public DataPoint(double lat, double lng, int bearing, double speed, GregorianCalendar date) {
 		super();
 		this.lat = lat;
 		this.lng = lng;
+		this.bearing = bearing;
 		this.speed = speed;
-		this.date = date;
+		this.cal = date;
 	}
 	
 	public double getLat() {
@@ -29,17 +32,23 @@ public class DataPoint {
 	public void setLng(double lng) {
 		this.lng = lng;
 	}
+	public int getBearing() {
+		return bearing;
+	}
+	public void setBearing(int bearing) {
+		this.bearing = bearing;
+	}
 	public double getSpeed() {
 		return speed;
 	}
 	public void setSpeed(double speed) {
 		this.speed = speed;
 	}
-	public Date getDate() {
-		return date;
+	public GregorianCalendar getCal() {
+		return cal;
 	}
-	public void setDate(Date date) {
-		this.date = date;
+	public void setCal(GregorianCalendar cal) {
+		this.cal = cal;
 	}
 
 }
