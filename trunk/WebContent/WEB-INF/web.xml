@@ -39,4 +39,14 @@
     <servlet-name>DataGenerator</servlet-name>
     <url-pattern>/DataGenerator</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DataPointServlet</display-name>
+    <servlet-name>DataPointServlet</servlet-name>
+    <servlet-class>au.com.trafmon.DataPointServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DataPointServlet</servlet-name>
+    <url-pattern>/DataPointServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
