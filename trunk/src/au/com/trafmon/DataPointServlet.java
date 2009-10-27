@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.db4o.ObjectContainer;
+
 /**
  * Servlet implementation class DataPointServlet
  */
@@ -36,37 +38,52 @@ public class DataPointServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		if(request.getParameter("lat") != null){
+		if (request.getParameter("lat") != null) {
 
-			//Here we have a post request to store a point
-			
-			double lat = Double.parseDouble(request.getParameter("lat"));
-			double lng = Double.parseDouble(request.getParameter("lng"));
-			int bearing = Integer.parseInt(request.getParameter("bearing"));
-			int speed = Integer.parseInt(request.getParameter("speed"));
-			String tag = request.getParameter("tag");
+			ObjectContainer db = Util.openDb();
 
-			DataPoint newPoint = new DataPoint(lat, lng, bearing, speed, tag, new Date());
-			
-			DataPointSet pointSet = new DataPointSet(newPoint);
-			
-			//Return the new point, why not!
-			PrintWriter out = response.getWriter();
+			try {
 
-			out.println(pointSet.toJSON());
+				// Here we have a post request to store a point
 
-		}else if(request.getParameter("maxlat") != null){
-			//Here we have a post request to return a number of points
+				double lat = Double.parseDouble(request.getParameter("lat"));
+				double lng = Double.parseDouble(request.getParameter("lng"));
+				int bearing = Integer.parseInt(request.getParameter("bearing"));
+				int speed = Integer.parseInt(request.getParameter("speed"));
+				String tag = request.getParameter("tag");
+
+				DataPoint newPoint = new DataPoint(lat, lng, bearing, speed, tag, new Date());
+
+				DataPointSet pointSet = new DataPointSet(newPoint);
+
+				db.store(newPoint);
+
+				// Return the new point, why not!
+				PrintWriter out = response.getWriter();
+
+				out.println(pointSet.toJSON());
+
+			} finally {
+				db.close();
+			}
+
+		} else if (request.getParameter("maxlat") != null) {
+			// Here we have a post request to return a number of points
 			final Double maxLat = Double.parseDouble(request.getParameter("maxLat"));
 			final Double maxLng = Double.parseDouble(request.getParameter("maxLng"));
 			final Double minLat = Double.parseDouble(request.getParameter("minLat"));
 			final Double minLng = Double.parseDouble(request.getParameter("minLng"));
 
-			// Here i am creating a date from the current time in milliseconds since January 1, 1970, 00:00:00 GMT
-			// I dont claim that this is the best format, and it could well change it in the future
+			// Here i am creating a date from the current time in
+			// milliseconds since January 1, 1970, 00:00:00 GMT
+			// I dont claim that this is the best format, and it
+			// could well change it in the future
 			// (its easy to make it parse a string for example)
 			Date date = new Date(Long.parseLong(request.getParameter("date")));
 
+			// As you can see by the method used, this will return all points
+			// that occur on the given day of the week (Monday, tuesday ect)
+			// during the given hour
 			DataPointSet pointSet = DataPointService.getPointsByDayOfWeek(maxLat, maxLng, minLat, minLng, date);
 
 			PrintWriter out = response.getWriter();
