@@ -20,13 +20,13 @@ import au.com.trafmon.Util;
 /**
  * Servlet implementation class DataGenerator
  */
-public class DataGenerator extends HttpServlet {
+public class DataGeneratorServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public DataGenerator() {
+	public DataGeneratorServlet() {
 		super();
 	}
 
@@ -65,8 +65,8 @@ public class DataGenerator extends HttpServlet {
 				String type = (String)request.getParameter("data");
 
 				if(type.equals("melbUni")){
-					DataPoint dp1 = new DataPoint(-37.800098, 144.961077, 1, 5, new GregorianCalendar());
-					DataPoint dp2 = new DataPoint(-37.800013, 144.960154, 2, 4, new GregorianCalendar());
+					DataPoint dp1 = new DataPoint(-37.800098, 144.961077, 1, 5, null, new GregorianCalendar());
+					DataPoint dp2 = new DataPoint(-37.800013, 144.960154, 2, 4, null, new GregorianCalendar());
 					db.store(dp1);
 					db.store(dp2);
 				}
