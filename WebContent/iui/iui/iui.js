@@ -10,6 +10,7 @@
 	var currentPage = null;
 	var currentDialog = null;
 	var currentWidth = 0;
+	var currentHeight = 0;
 	var currentHash = location.hash;
 	var hashPrefix = "#_";
 	var pageHistory = [];
@@ -137,7 +138,24 @@
 				new RegExp("^http:\/\/www.youtube.com\/v\/"),
 				new RegExp("^javascript:")
 
-		]
+		],
+		hasClass : function(self, name) {
+			var re = new RegExp("(^|\\s)" + name + "($|\\s)");
+			return re.exec(self.getAttribute("class")) != null;
+		},
+
+		addClass : function(self, name) {
+			if (!iui.hasClass(self, name))
+				self.className += " " + name;
+		},
+
+		removeClass : function(self, name) {
+			if (iui.hasClass(self, name)) {
+				var reg = new RegExp('(\\s|^)' + name + '(\\s|$)');
+				self.className = self.className.replace(reg, ' ');
+			}
+		}
+
 	};
 
 	// ************************************************************************************
@@ -187,6 +205,8 @@
 						history.back();
 					else if (link.getAttribute("type") == "submit")
 						submitForm(findParent(link, "form"));
+					else if (link.getAttribute("href") == "_back")
+						history.back();
 					else if (link.getAttribute("type") == "cancel")
 						cancelDialog(findParent(link, "form"));
 					else if (link.target == "_replace") {
@@ -243,9 +263,13 @@
 
 	function checkOrientAndLocation() {
 		if (!hasOrientationEvent) {
-			if (window.innerWidth != currentWidth) {
+			if ((window.innerWidth != currentWidth)
+					|| (window.innerHeight != currentHeight)) {
 				currentWidth = window.innerWidth;
-				var orient = currentWidth == 320 ? portraitVal : landscapeVal;
+				currentHeight = window.innerHeight;
+				var orient = (currentWidth < currentHeight)
+						? portraitVal
+						: landscapeVal;
 				setOrientation(orient);
 			}
 		}
@@ -258,9 +282,20 @@
 
 	function setOrientation(orient) {
 		document.body.setAttribute("orient", orient);
+		// Set class in addition to orient attribute:
+		if (orient == portraitVal) {
+			iui.removeClass(document.body, landscapeVal);
+			iui.addClass(document.body, portraitVal);
+		} else if (orient == landscapeVal) {
+			iui.removeClass(document.body, portraitVal);
+			iui.addClass(document.body, landscapeVal);
+		} else {
+			iui.removeClass(document.body, portraitVal);
+			iui.removeClass(document.body, landscapeVal);
+		}
 		setTimeout(scrollTo, 100, 0, 1);
 		// trafmon- resize map div
-		// google.maps.event.trigger(map, 'resize');
+		google.maps.event.trigger(map, 'resize');
 	}
 
 	function showDialog(page) {

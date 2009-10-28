@@ -21,7 +21,7 @@
             <a id="backButton" class="button" href="#"></a>
             <a id="fwdButton" class="button" href="#"></a>
         </div>
-        <div id="home" title="Home" class="panel" selected="true" fwdtitle="Start" fwdhref="#map_canvas">
+        <div id="home" title="Home" class="panel" selected="true" fwdtitle="Start TrafMon!" fwdhref="#map_canvas">
             <!--<h1>Welcome to TrafMon!</h1>
             <p>
             Please select your startup options.
@@ -51,7 +51,7 @@
             <fieldset>
                 <div class="row">
                     <label>
-                        Report Location
+                        Share My Location
                     </label>
                     <div class="toggle" onclick="trafmon.toggleReporting();" toggled="true" id="report_loc">
                         <span class="thumb"></span>
@@ -60,6 +60,9 @@
                     </div>
                 </div>
             </fieldset>
+            <p>
+                Your location will be shared anonymously.
+            </p>
         </div>
         <div id="map_canvas" title="Map" fwdtitle="Options" fwdhref="#options">
             <div style="margin: 150px 40px 40px 0px;width:100%;text-align:center;">
@@ -70,13 +73,13 @@
             </div>
         </div>
         <div id="options" title="Options" class="panel" fwdtitle="About" fwdhref="#about">
-            <h2>Playback</h2>
+            <h2>Traffic Types</h2>
             <fieldset>
                 <div class="row">
                     <label>
-                        Repeat
+                        Private Cars
                     </label>
-                    <div class="toggle" onclick="">
+                    <div class="toggle" onclick="" toggled="true">
                         <span class="thumb"></span>
                         <span class="toggleOn">ON</span>
                         <span class="toggleOff">OFF</span>
@@ -84,7 +87,7 @@
                 </div>
                 <div class="row">
                     <label>
-                        Shuffle
+                        Public Transport
                     </label>
                     <div class="toggle" onclick="" toggled="true">
                         <span class="thumb"></span>
@@ -93,35 +96,99 @@
                     </div>
                 </div>
             </fieldset>
-            <h2>User</h2>
+            <h2>Traffic Times</h2>
             <fieldset>
-                <div class="row">
-                    <label>
-                        Name
-                    </label>
-                    <input type="text" name="userName" value="johnappleseed"/>
+                <div class="arow last" id="day_opt_row">
+                    <a href="#day" id="day_opt"><b>Live Traffic</b></a>
                 </div>
-                <div class="row">
-                    <label>
-                        Password
-                    </label>
-                    <input type="password" name="password" value="delicious"/>
-                </div>
-                <div class="row">
-                    <label>
-                        Confirm
-                    </label>
-                    <input type="password" name="password" value="delicious"/>
+                <div class="arow" style="display:none" id="time_opt_row">
+                    <a href="#time" id="time_opt">Time of Day</a>
                 </div>
             </fieldset>
         </div>
+        <ul id="day" title="Day of Week">
+            <li>
+                <a href="_back" onclick="setDayOpt(this)"><b>Live Traffic</b></a>
+            </li>
+            <li>
+                <a href="_back" onclick="setDayOpt(this)">Monday</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setDayOpt(this)">Tuesday</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setDayOpt(this)">Wednesday</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setDayOpt(this)">Thursday</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setDayOpt(this)">Friday</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setDayOpt(this)">Saturday</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setDayOpt(this)">Sunday</a>
+            </li>
+        </ul>
+        <ul id="time" title="Time of Day">
+            <li>
+                <a href="_back" onclick="setTimeOpt(this)">Early Morning (12 AM - 6 AM)</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setTimeOpt(this)">Morning Peak (6 AM - 9 AM)</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setTimeOpt(this)">Daytime (9 AM - 4:30 PM)</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setTimeOpt(this)">Afternoon Peak (4:30 PM - 7 PM)</a>
+            </li>
+            <li>
+                <a href="_back" onclick="setTimeOpt(this)">Evening (7 PM - 12 AM)</a>
+            </li>
+        </ul>
         <div id="about" title="About" class="panel">
+            <img src="images/logo.png" /><h2>Project Information</h2>
             <p>
-                This is the about page.
+                Trafmon is an open source web application for iPhone and iPod Tough designed to crowdsource live traffic congestion data using geolocation features.
             </p>
+            <h2>Important Privacy Information</h2>
             <p>
-                <a href="#map_canvas">Back to map.</a>
+                TrafMon collects and stores data about your location and speed, including the dates and times when you use the application. All information is <b>completely anonymous</b>
+                and we never identify individual iPhone or iPod touch users based on this information.
             </p>
+            <h2>Credits</h2>
+            <p>
+                Stephen Chester, Paul Coster and Simon Whitehead. 
+            </p>
+            <h2>Project Technologies</h2>
+            <ul>
+                <li>
+                    <b>Google Maps API v3:</b>
+                    optimised for mobile devices
+                </li>
+                <li>
+                    <b>iUi:</b> an iPhone-style web interface library by Joe Hewitt
+                </li>
+                <li>
+                    <b>W3C Geolocation API:</b>
+                    supported by Apple Mobile Safari
+                </li>
+                <li>
+                    <b>db4o:</b>
+                    object-oriented database engine
+                </li>
+                <li>
+                    <b>Apache Tomcat:</b>
+                    Java Servlet web server platform
+                </li>
+                <li>
+                    <b>Google Code:</b>
+                    open source project hosting and SVN repository
+                </li>
+            </ul>
         </div>
     </body>
 </html>

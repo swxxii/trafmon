@@ -62,6 +62,21 @@ body > ul > li > a {
     background: url(listArrow.png) no-repeat right center;
 }
 
+.arow > a {
+    position: absolute;
+    margin: 0 0 0 14px;
+    line-height: 42px;
+    text-decoration:none;
+    color: black;
+    display: block;
+    width: 95%;
+    text-align:left;
+}
+
+.arow {
+	background: url(listArrow.png) no-repeat right center;
+}
+
 /************************************************************************************************/
     
 .dialog > fieldset {

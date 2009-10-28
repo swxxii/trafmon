@@ -29,16 +29,14 @@ function setVal(id, val) {
 		case 'SPAN' :
 		case 'DIV' :
 		case 'TEXTAREA' :
+		case 'A' :
 			elem.innerHTML = val;
 			return true;
-			break;
 		case 'INPUT' :
 			elem.value = val;
 			return true;
-			break;
 		default :
 			return false;
-			break;
 	}
 	return false;
 }
@@ -52,19 +50,16 @@ function getVal(id) {
 		case 'SPAN' :
 		case 'DIV' :
 		case 'TEXTAREA' :
+		case 'A' :
 			return elem.innerHTML;
-			break;
 		case 'INPUT' :
 			return elem.value;
-			break;
 		case 'SELECT' :
 			indx = elem.selectedIndex;
 			optelem = elem.options[indx];
 			return optelem.id;
-			break;
 		default :
 			return false;
-			break;
 	}
 	return false;
 }
@@ -101,14 +96,35 @@ function hideElement(id) {
 	elem = document.getElementById(id);
 	if (elem)
 		elem.style.display = "none";
-
 }
 
 function unHideElement(id) {
 	elem = document.getElementById(id);
 	if (elem)
 		elem.style.display = "inline";
+}
+function unHideBlockElement(id) {
+	elem = document.getElementById(id);
+	if (elem)
+		elem.style.display = "block";
+}
 
+function setDayOpt(elem) {
+	dr = document.getElementById('day_opt_row');
+	newopt = elem.innerHTML;
+	setVal('day_opt', newopt);
+	if (newopt == "<b>Live Traffic</b>") {
+		dr.setAttribute('class', 'arow last');
+		hideElement('time_opt_row');
+	} else {
+		dr.setAttribute('class', 'arow');
+		unHideBlockElement('time_opt_row');
+	}
+}
+
+function setTimeOpt(elem) {
+	newopt = elem.innerHTML;
+	setVal('time_opt', newopt);
 }
 
 /*
@@ -166,12 +182,10 @@ function clearCookie(name) {
 	setCookie(name, '', -1);
 }
 
-
-
-
-function iPhoneRedirect(url) {
+function iPhoneRedirect(url, url2) {
 	if ((navigator.userAgent.match(/iPhone/i))
 			|| (navigator.userAgent.match(/iPod/i))) {
 		window.location = url;
-	}
+	} else
+		window.location = url2;
 }

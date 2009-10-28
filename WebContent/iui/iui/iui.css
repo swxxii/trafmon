@@ -23,9 +23,12 @@ body > *:not(.toolbar) {
     -webkit-transform: translateX(0%);
 }
 
-body[orient="landscape"] > #map*:not(.toolbar) {
-    min-height: 268px;
+/*body[orient="landscape"] > #map_canvas*:not(.toolbar) {*/
+body[orient="landscape"] > *:not(.toolbar), body.landscape > *:not(.toolbar) {
+    min-height: 224px;
 }
+
+
 
 body > *[selected="true"] {
     display: block;
@@ -166,8 +169,8 @@ body > ul > li {
     margin: 0;
     border-bottom: 1px solid #E0E0E0;
     padding: 8px 0 8px 10px;
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 16px;
+    line-height: 30px;
     list-style: none;
 }
 
@@ -289,7 +292,7 @@ body  .panel {
 	margin: 8px 8px 8px 12px;
 }
 
-.row  {
+.row, .arow  {
     position: relative;
     min-height: 42px;
     border-bottom: 1px solid #999999;
@@ -297,7 +300,7 @@ body  .panel {
     text-align: right;
 }
 
-fieldset > .row:last-child {
+fieldset > .row:last-child, fieldset > .arow:last-child, fieldset > .last {
     border-bottom: none !important;
 }
 
@@ -331,6 +334,7 @@ div.row > input[type|=text].wide {
     padding: 12px 10px 0 110px;
     margin: 0;
 }
+
 
 .row > .toggle {
     position: absolute;
@@ -396,12 +400,18 @@ div.row > input[type|=text].wide {
 }
 
 .panel  h2 {
-    margin: 4px 0 8px 14px;
+    margin: 14px 0 8px 10px;
     font-size: inherit;
     font-weight: bold;
     color: #4d4d70;
     text-shadow: rgba(255, 255, 255, 0.75) 1px 1px 0;
 }
+.panel > ul > li {
+    line-height: 22px;
+    font-size: 14px;
+}
+.panel > ul {
+	margin-top: 0px;
 
 /************************************************************************************************/
 
