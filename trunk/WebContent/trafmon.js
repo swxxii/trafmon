@@ -25,8 +25,8 @@ trafmon = {
 	// Default map location (if geolocation fails)
 	DEFAULT_LAT : -37.798985,
 	DEFAULT_LONG : 144.964685,
-	DEFAULT_ZOOM : 14,
-	DEFAULT_ZOOM_SUCCESS : 14,
+	DEFAULT_ZOOM : 15,
+	DEFAULT_ZOOM_SUCCESS : 15,
 	DEFAULT_NAVI_CONTROL : google.maps.NavigationControlStyle.ANDROID,
 	IMAGE_BASE_URL : 'images/',
 	MAP_CENTERED_ONCE : false,
@@ -47,6 +47,7 @@ trafmon = {
 
 	// marker for user's position
 	USER_MARKER : false,
+	FIRST_CENTER : false,
 
 	// location reporting enabled?
 	REPORT_LOCATION : true,
@@ -74,7 +75,7 @@ trafmon = {
 	 */
 	desktopInit : function() {
 		// redirect iphone clients
-		iPhoneRedirect('iphone.html');
+		//iPhoneRedirect('iphone.html');
 		// get map options object
 		var mapopts = trafmon.getMapOptions(true);
 		// change controls
@@ -163,10 +164,14 @@ trafmon = {
 	 *            event: google.maps.MouseClick event
 	 */
 	listenerClick : function(event) {
+		return;
 		point = event.latLng;
 		// alert(point);
-		data = "{ 'lat': " + point.lat() + ", 'lng': " + point.lng()
-				+ ", 'bearing': 51,'speed':40}, ";
+		d = getVal('search');
+		b = d.split(',')[0];
+		s = d.split(',')[1];
+		data = '{ "lat": ' + point.lat() + ', "lng": ' + point.lng()
+				+ ', "bearing": ' + b + ',"speed":' + s + '}, ';
 		txt = getVal('debug');
 		setVal('debug', txt + data);
 	},
@@ -176,7 +181,7 @@ trafmon = {
 	 **************************************************************************/
 
 	/**
-	 * Init Position : called on load (note DIV will have 0x0 dimensions)
+	 * Init Position : called on load
 	 */
 	initPosition : function() {
 		// get current location
@@ -306,7 +311,10 @@ trafmon = {
 
 		// center map view on every pass (this is annoying and should be
 		// user-triggered with a button)
-		// map.set_center(myLatLng);
+		if (!trafmon.FIRST_CENTER) {
+			map.set_center(trafmon.getPositionLatLng());
+			trafmon.FIRST_CENTER = true;
+		}
 	},
 
 	/**
