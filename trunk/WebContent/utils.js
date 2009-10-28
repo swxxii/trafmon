@@ -1,8 +1,4 @@
-/*
- * auxfunc.js Used in JavaScript Password Generator Author: Simon Whitehead
- * Date: October 2006 Notes: These functions are in a separate file because I
- * indend to use them in future projects.
- */
+
 
 function randbetween(x, y) {
 	range = Math.abs(y - x);
@@ -170,47 +166,8 @@ function clearCookie(name) {
 	setCookie(name, '', -1);
 }
 
-/*
- * init a global XmlHTTPRequest to use
- */
-var xmlhttp = false;
-if (window.XMLHttpRequest) {
-	xmlhttp = new XMLHttpRequest();
-} else if (window.ActiveXObject) {
-	xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-}
 
-/**
- * Example AJAX request function
- * 
- * @param {}
- *            destination URL
- * @param {}
- *            params POST content e.g. 'id=1&rating=-2'
- */
-function ajaxRequest(destination, params) {
-	var data = false;
-	if (xmlhttp) {
-		xmlhttp.open('POST', destination, true);
-		xmlhttp.setRequestHeader("Content-type",
-				"application/x-www-form-urlencoded");
-		xmlhttp.onreadystatechange = function() {
-			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-				// code here runs when request complete
-				data = xmlhttp.responseText;
-			}
-		};
-		xmlhttp.send(params);
-	}
-	return data;
-}
 
-function jsonRequest(dest, params) {
-	data = ajaxRequest(dest, params);
-	if (data)
-		return JSON.parse(data);
-	return false;
-}
 
 function iPhoneRedirect(url) {
 	if ((navigator.userAgent.match(/iPhone/i))

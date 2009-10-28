@@ -12,7 +12,6 @@
 // google maps API container
 var map = false;
 
-
 /*
  * Class: TrafMon
  */
@@ -74,6 +73,8 @@ trafmon = {
 	 * Initialize the google maps api (desktop version)
 	 */
 	desktopInit : function() {
+		// redirect iphone clients
+		iPhoneRedirect('iphone.html');
 		// get map options object
 		var mapopts = trafmon.getMapOptions(true);
 		// change controls
@@ -107,68 +108,12 @@ trafmon = {
 	/***************************************************************************
 	 * Common Main Method:
 	 * 
-	 * runs on both iPhone and desktop versions once initialised
+	 * runs on both iPhone and desktop versions once each initialised
 	 * 
 	 **************************************************************************/
 	commonMain : function() {
-
 		// turn on event listeners
 		trafmon.setListeners();
-
-		// test
-		//datas1 = ajaxRequest('data.json','');
-		
-		
-		datas = [{
-					'lat' : -37.80586845802654,
-					'lng' : 144.9630971322632,
-					'bearing' : 5,
-					'speed' : 40
-				}, {
-					'lat' : -37.804342623659004,
-					'lng' : 144.96335462432862,
-					'bearing' : 5,
-					'speed' : 40
-				}, {
-					'lat' : -37.80295239156705,
-					'lng' : 144.9635692010498,
-					'bearing' : 5,
-					'speed' : 40
-				}, {
-					'lat' : -37.80129086035017,
-					'lng' : 144.96382669311524,
-					'bearing' : 5,
-					'speed' : 40
-				}, {
-					'lat' : -37.80003620996976,
-					'lng' : 144.9641271005249,
-					'bearing' : 5,
-					'speed' : 40
-				}, {
-					'lat' : -37.79844243416238,
-					'lng' : 144.96442750793457,
-					'bearing' : 5,
-					'speed' : 40
-				}, {
-					'lat' : -37.79671297895897,
-					'lng' : 144.96464208465576,
-					'bearing' : 5,
-					'speed' : 40
-				}, {
-					'lat' : -37.79491565908105,
-					'lng' : 144.96494249206543,
-					'bearing' : 5,
-					'speed' : 40
-				}, {
-					'lat' : -37.79355916229501,
-					'lng' : 144.96477083068848,
-					'bearing' : 5,
-					'speed' : 40
-				}];
-
-		for (i = 0; i < datas.length; i++) {
-			trafmon.markers[i] = new TrafficMarker(datas[i], map);
-		}
 	},
 
 	/**
@@ -207,10 +152,8 @@ trafmon = {
 	listenerBoundsChanged : function() {
 		// get new bounds
 		bounds = map.getBounds();
-		ne = bounds.getNorthEast();
-		sw = bounds.getSouthWest();
-		// do stuff
-		// alert('NE: ' + ne + ' SW:' + sw);
+		// invoke json request for points (which then invokes point plotter)
+		trafmon.getPointsJSON('data.json', bounds);
 	},
 
 	/**
@@ -223,7 +166,7 @@ trafmon = {
 		point = event.latLng;
 		// alert(point);
 		data = "{ 'lat': " + point.lat() + ", 'lng': " + point.lng()
-				+ ", 'bearing': 5,'speed':40}, ";
+				+ ", 'bearing': 51,'speed':40}, ";
 		txt = getVal('debug');
 		setVal('debug', txt + data);
 	},
@@ -366,33 +309,6 @@ trafmon = {
 		// map.set_center(myLatLng);
 	},
 
-	// // old version - not used
-	// updateMyMarker : function() {
-	// var myLatLng = trafmon.getPositionLatLng();
-	//
-	// // first time build the marker
-	// if (!trafmon.myMarker) {
-	//
-	// var image = new google.maps.MarkerImage(
-	// 'images/blue_dot_circle.png', new google.maps.Size(38, 38), // size
-	// new google.maps.Point(0, 0), // origin
-	// new google.maps.Point(19, 19) // anchor
-	// );
-	// trafmon.myMarker = new google.maps.Marker({
-	// position : myLatLng,
-	// map : map,
-	// icon : image,
-	// clickable : false,
-	// draggable : false,
-	// flat : true
-	// });
-	// } else {
-	// // change marker position on subsequent passes
-	// trafmon.myMarker.set_position(myLatLng);
-	// }
-	// // center map view on every pass (this may be annoying)
-	// map.set_center(myLatLng);
-	// },
 	/**
 	 * Gets the right marker image based on bearing and speed
 	 * 
@@ -448,7 +364,7 @@ trafmon = {
 	 * @return {} a string representing the color
 	 */
 	getSpeedColor : function(speed) {
-		return 'red';
+		// return 'amber';
 		if (speed == 0)
 			return 'black';
 		if (speed > 0 && speed <= 20)
@@ -457,6 +373,89 @@ trafmon = {
 			return 'amber';
 		if (speed > 40)
 			return 'green';
+	},
+
+	/***************************************************************************
+	 * METHODS: JSON/Points Plotting
+	 **************************************************************************/
+
+	/**
+	 * Fetch some marker points using Ajax request
+	 * 
+	 * @param {}
+	 *            url: location to load (must be on same server)
+	 * @param {}
+	 *            bounds: google maps LatLngBounds object
+	 */
+	getPointsJSON : function(url, bounds) {
+		// create request object
+		var xmlhttp = false;
+		if (window.XMLHttpRequest) {
+			xmlhttp = new XMLHttpRequest();
+		} else if (window.ActiveXObject) {
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		// setup request
+		if (xmlhttp) {
+			xmlhttp.open('POST', url, true);
+			xmlhttp.setRequestHeader("Content-type",
+					"application/x-www-form-urlencoded");
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					// when we have the data, invoke points plotter
+					// json = JSON.parse(xmlhttp.responseText); // firefox
+					json = eval('(' + xmlhttp.responseText + ')'); // safari
+					trafmon.plotPoints(json, bounds);
+				}
+			};
+			// override returned mime type (or firefox won't parse)
+			xmlhttp.overrideMimeType("application/json");
+			// construct params string
+			ne = bounds.getNorthEast();
+			sw = bounds.getSouthWest();
+			minLat = sw.lat();
+			minLng = sw.lng();
+			maxLat = ne.lat();
+			maxLng = ne.lng();
+			params = "minLat=" + minLat + "&minLng=" + minLng + "&maxLat="
+					+ maxLat + "&maxLng=" + maxLng + "";
+			// send request
+			xmlhttp.send(params);
+		}
+	},
+
+	/**
+	 * Plot the marker points recieved from JSON request
+	 * 
+	 * @param {}
+	 *            points array of point objects to plot
+	 * @return number of markers plotted.
+	 */
+	plotPoints : function(points, bounds) {
+		// check for valid data
+		if (!points)
+			return false;
+		// first delete all markers (TODO inefficient - should only delete
+		// markers outside new bounds)
+		for (i = 0; i < trafmon.markers.length; i++) {
+			if (trafmon.markers[i])
+				trafmon.markers[i].setMap(null);
+		}
+		// reset the markers field (hack!)
+		trafmon.markers = [];
+		// plot all new markers (TODO inefficient - should not replot markers
+		// inside bounds which are already plotted, however they may have
+		// changed so we should check for true equality on all points fields)
+		for (i = 0; i < points.length; i++) {
+			// get point coords as LatLng
+			pointLatLng = new google.maps.LatLng(points[i].lat, points[i].lng)
+			// skip points not within bounds - Google are supermega awesome for
+			// their contains() function
+			if (!bounds.contains(pointLatLng))
+				continue;
+			// (else) plot the marker
+			trafmon.markers[i] = new TrafficMarker(points[i], map);
+		}
 	},
 
 	/***************************************************************************
@@ -587,7 +586,7 @@ function TrafficMarker(data, map) {
 	// get position out of data object & set LatLng
 	this.latlng_ = new google.maps.LatLng(data.lat, data.lng);
 	// default image dimensions
-	this.imgDim_ = 11;
+	this.imgDim_ = 16;
 
 	// if data point is the user's location and not a traffic point
 	if (data.own) {
@@ -625,6 +624,8 @@ TrafficMarker.prototype.draw = function() {
 		div.style.width = this.imgDim_ + 'px';
 		div.style.height = this.imgDim_ + 'px';
 		div.style.background = 'url(' + this.image_ + ') no-repeat';
+		div.style.filter = "alpha(opacity=75)"; // firefox
+		div.style.opacity = "0.75"; // IE
 
 		// create IMG inside DIV
 		// var img = document.createElement("IMG");
