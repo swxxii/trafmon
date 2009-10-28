@@ -1,31 +1,37 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>TrafMon Central</title>
-        <link rel="stylesheet" href="desktop.css" type="text/css" />
+        <title>trafmon desktop</title>
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true">
+        </script>
         <script type="application/x-javascript" src="utils.js">
         </script>
+        <script type="text/javascript" src="trafmon.js">
+        </script>
+        <link rel="stylesheet" href="desktop.css" type="text/css" />
     </head>
-    <body onload="iPhoneRedirect('iphone.html');">
-        <h1>trafmon home</h1>
-        <p>
-            <a href="desktop.html">desktop</a>
-            | <a href="iphone.html">iphone</a>
-        </p>
-        <hr/>
-        <p>
-            <a href="./SnoopServlet">Here is the page that reports your browser!</a>
-        </p>
-        <p>
-            <a href="./Db4oServlet">Here is the page that does db stuff</a>
-        </p>
-        <p>
-            <a href="./DataGenerator">Go here to insert data into the db</a>
-        </p>
-        	<form name="delete" method="post" action="DataGenerator">
-        		<input type="hidden" name="operation" value="delete"/><br/>
-				<input type="submit" value="Delete All Data"/>
-			</form>
+    <body onload="trafmon.desktopInit();">
+        <img src="images/logo.png" alt="trafmon" />
+        <table id="menu">
+            <tr>
+                <td class="search">
+                    <!--
+                    <input id="search" type="text" value="search" onfocus="clearOnce('search');" onkeydown="checkEnter(event,'trafmon.desktopGeoCode();')"/>
+                    -->
+                </td>
+                <td class="nav">
+                    <a href="iphone.html">iphone</a> | 
+                    <a href="#" onclick="trafmon.desktopInit();">reset</a>
+                    
+                </td>
+                <td class="info">
+                </td>
+            </tr>
+        </table>
+        <div id="map_canvas">
+        </div>
+        <br/>
+        <div id="debug">
+        </div>
     </body>
 </html>
