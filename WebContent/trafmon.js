@@ -154,7 +154,7 @@ trafmon = {
 		// get new bounds
 		bounds = map.getBounds();
 		// invoke json request for points (which then invokes point plotter)
-		trafmon.getPointsJSON('data.json', bounds);
+		trafmon.getPointsJSON('Data.json', bounds);
 	},
 
 	/**
