@@ -29,6 +29,26 @@
     <servlet-name>Db4oServlet</servlet-name>
     <url-pattern>/Db4oServlet</url-pattern>
   </servlet-mapping>
+    <servlet>
+    <description></description>
+    <display-name>SimpleTestServlet</display-name>
+    <servlet-name>SimpleTestServlet</servlet-name>
+    <servlet-class>au.com.trafmon.sample.SimpleTestServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SimpleTestServlet</servlet-name>
+    <url-pattern>/SimpleTestServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>CopyOfDb4oServlet</display-name>
+    <servlet-name>CopyOfDb4oServlet</servlet-name>
+    <servlet-class>au.com.trafmon.sample.CopyOfDb4oServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CopyOfDb4oServlet</servlet-name>
+    <url-pattern>/CopyOfDb4oServlet</url-pattern>
+  </servlet-mapping>
   <servlet>
     <description></description>
     <display-name>DataGenerator</display-name>

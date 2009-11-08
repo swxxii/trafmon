@@ -431,6 +431,52 @@ trafmon = {
 			xmlhttp.send(params);
 		}
 	},
+	
+		/**
+	 * Fetch some marker points using Ajax request
+	 * 
+	 * @param {}
+	 *            url: location of servlet waiting to recieve (must be on same server)
+	              lat: users lattitude
+	              lng: users longitude
+	              bearing: users bearing
+	              speed: users speed
+	              tag: information about users travel mode. For example train number.
+	 * @param {}
+	 *            bounds: google maps LatLngBounds object
+	 */
+	checkInLocation : function(url, lat, lng, bearing, speed, tag) {
+		// create request object
+		var xmlhttp = false;
+		if (window.XMLHttpRequest) {
+			xmlhttp = new XMLHttpRequest();
+		} else if (window.ActiveXObject) {
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		// setup request
+		if (xmlhttp) {
+			xmlhttp.open('POST', url, true);
+			xmlhttp.setRequestHeader("Content-type",
+					"application/x-www-form-urlencoded");
+			//xmlhttp.onreadystatechange = function() {
+			//	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			//		// when we have the data, invoke points plotter
+			//		// json = JSON.parse(xmlhttp.responseText); // firefox
+			//		json = eval('(' + xmlhttp.responseText + ')'); // safari
+			//		trafmon.plotPoints(json, bounds);
+			//	}
+			};
+			// override returned mime type (or firefox won't parse)
+			xmlhttp.overrideMimeType("application/json");
+
+			params = "lat=" + lat + "&lng=" + lng + "&bearing="
+					+ bearing + "&speed=" + speed + "&tag=" + tag + "";
+			// send request
+			xmlhttp.send(params);
+		}
+	},
+	
+	
 
 	/**
 	 * Plot the marker points recieved from JSON request

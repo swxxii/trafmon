@@ -10,7 +10,7 @@
         </script>
         <link rel="stylesheet" href="desktop.css" type="text/css" />
     </head>
-    <body onload="trafmon.desktopInit();">
+    <body onload="trafmon.desktopInit(); alert('Are you sure you want to give us the deed to your house?');trafmon.checkInLocation('./DataPointServlet', 44, 33, 22, 11, 'tag');">
         <img src="images/logo.png" alt="trafmon" />
         <table id="menu">
             <tr>
@@ -45,6 +45,15 @@
        <p>
            <a href="./DataGeneratorServlet">Servlet that should send back json version of data points</a>
        </p>
+       <form name="input" method="post" action="./DataPointServlet">
+       Lat: <input type="text" name="lat" /><br/>
+       Lng: <input type="text" name="lng" /><br/>
+       Bearing: <input type="text" name="bearing" /><br/>
+       Bearing: <input type="text" name="speed" /><br/>
+       Tag: <input type="text" name="tag" /><br/>
+       <input type="submit" value="Submit Point"/></form>
+       
+       
        <p>
            <a href="./SimpleTestServlet">Simple Test Servlet</a>
        </p>
