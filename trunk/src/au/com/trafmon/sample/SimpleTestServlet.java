@@ -23,12 +23,14 @@ import au.com.trafmon.Util;
  */
 public class SimpleTestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	ObjectContainer db;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public SimpleTestServlet() {
 		super();
+		db = Util.openDb();
 	}
 
 	/**
@@ -37,8 +39,16 @@ public class SimpleTestServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//request.setAttribute("TestAttr", "AttrVal");
-		request.getRequestDispatcher("/WEB-INF/dataPoints.jsp").forward(
-				request, response);
+		//request.getRequestDispatcher("/WEB-INF/dataPoints.jsp").forward(
+		//		request, response);
+		
+//		response.setContentType("text/html");
+//		PrintWriter writer = response.getWriter();
+//		writer.println("<html>");
+//		writer.println("<head><title>Hello World Servlet</title></head>");
+//		writer.println("<body>Hello World! How are you doing?</body>");
+//		writer.println("</html>");
+//		writer.close();		
 	}
 
 	/**
@@ -47,7 +57,26 @@ public class SimpleTestServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//request.setAttribute("TestAttr", "AttrVal");
-		request.getRequestDispatcher("/WEB-INF/dataPoints.jsp").forward(
-				request, response);
+		//request.getRequestDispatcher("/WEB-INF/dataPoints.jsp").forward(
+		//		request, response);
+		String point = (String)request.getParameter("point");
+//		db.store(new DataPoint(point, 0));
+
+//		List<DataPoint> list = db.query(new Predicate<DataPoint>() {
+//			public boolean match(Pilot candidate) {
+//				return true;
+//			}
+//		});
+		
+		
+		
+//		response.setContentType("text/html");
+//		PrintWriter writer = response.getWriter();
+//		writer.println("<html>");
+//		writer.println("<head><title>Hello World Servlet</title></head>");
+//		writer.println("<body>Hello World! How are you doing?</body>");
+//		writer.println("</html>");
+//		writer.close();		
+				
     }
 }
