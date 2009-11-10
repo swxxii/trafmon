@@ -1,7 +1,6 @@
 package au.com.trafmon.sample;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -47,9 +46,8 @@ public class DataGeneratorServlet extends HttpServlet {
 		String operation = request.getParameter("operation");
 
 		if(operation.equalsIgnoreCase("delete")){
-			Boolean status;
 
-			if((status = Util.deleteDB()) == true){
+			if((Util.deleteDB()) == true){
 				System.out.println("File deleted.");
 			}else{
 				System.out.println("Deletion failed.");
