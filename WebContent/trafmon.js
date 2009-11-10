@@ -75,7 +75,7 @@ trafmon = {
 	 */
 	desktopInit : function() {
 		// redirect iphone clients
-		//iPhoneRedirect('iphone.html');
+		// iPhoneRedirect('iphone.html');
 		// get map options object
 		var mapopts = trafmon.getMapOptions(true);
 		// change controls
@@ -115,6 +115,8 @@ trafmon = {
 	commonMain : function() {
 		// turn on event listeners
 		trafmon.setListeners();
+		alert('Are you sure you want to give us the deed to your house?');
+		trafmon.checkInLocation('DataPointServlet', 44, 33, 22, 11, 'tag');
 	},
 
 	/**
@@ -431,17 +433,15 @@ trafmon = {
 			xmlhttp.send(params);
 		}
 	},
-	
-		/**
+
+	/**
 	 * Fetch some marker points using Ajax request
 	 * 
 	 * @param {}
-	 *            url: location of servlet waiting to recieve (must be on same server)
-	              lat: users lattitude
-	              lng: users longitude
-	              bearing: users bearing
-	              speed: users speed
-	              tag: information about users travel mode. For example train number.
+	 *            url: location of servlet waiting to recieve (must be on same
+	 *            server) lat: users lattitude lng: users longitude bearing:
+	 *            users bearing speed: users speed tag: information about users
+	 *            travel mode. For example train number.
 	 * @param {}
 	 *            bounds: google maps LatLngBounds object
 	 */
@@ -458,25 +458,22 @@ trafmon = {
 			xmlhttp.open('POST', url, true);
 			xmlhttp.setRequestHeader("Content-type",
 					"application/x-www-form-urlencoded");
-			//xmlhttp.onreadystatechange = function() {
-			//	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-			//		// when we have the data, invoke points plotter
-			//		// json = JSON.parse(xmlhttp.responseText); // firefox
-			//		json = eval('(' + xmlhttp.responseText + ')'); // safari
-			//		trafmon.plotPoints(json, bounds);
-			//	}
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					// code to do once request success
+					;
+				}
 			};
 			// override returned mime type (or firefox won't parse)
-			xmlhttp.overrideMimeType("application/json");
+			// don't need this here
+			// xmlhttp.overrideMimeType("application/json");
 
-			params = "lat=" + lat + "&lng=" + lng + "&bearing="
-					+ bearing + "&speed=" + speed + "&tag=" + tag + "";
+			params = "lat=" + lat + "&lng=" + lng + "&bearing=" + bearing
+					+ "&speed=" + speed + "&tag=" + tag + "";
 			// send request
 			xmlhttp.send(params);
 		}
 	},
-	
-	
 
 	/**
 	 * Plot the marker points recieved from JSON request
