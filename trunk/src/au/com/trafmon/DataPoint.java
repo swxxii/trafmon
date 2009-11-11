@@ -37,6 +37,10 @@ public class DataPoint {
 		this.cal = newCal;
 	}
 
+	public DataPoint() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public double getLat() {
 		return lat;
 	}

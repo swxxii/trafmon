@@ -3,6 +3,7 @@ package au.com.trafmon;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -67,25 +68,30 @@ public class DataPointServlet extends HttpServlet {
 				db.close();
 			}
 
-		} else if (request.getParameter("maxlat") != null) {
+		} else if (request.getParameter("maxLat") != null) {
 			// Here we have a post request to return a number of points
 			final Double maxLat = Double.parseDouble(request.getParameter("maxLat"));
 			final Double maxLng = Double.parseDouble(request.getParameter("maxLng"));
 			final Double minLat = Double.parseDouble(request.getParameter("minLat"));
 			final Double minLng = Double.parseDouble(request.getParameter("minLng"));
 
+			//TODO
 			// Here i am creating a date from the current time in
 			// milliseconds since January 1, 1970, 00:00:00 GMT
 			// I dont claim that this is the best format, and it
 			// could well change it in the future
 			// (its easy to make it parse a string for example)
-			Date date = new Date(Long.parseLong(request.getParameter("date")));
+			//Date date = new Date(Long.parseLong(request.getParameter("date")));
+			Date date = new Date();
 
 			// As you can see by the method used, this will return all points
 			// that occur on the given day of the week (Monday, tuesday ect)
 			// during the given hour
-			DataPointSet pointSet = DataPointService.getPointsByDayOfWeek(maxLat, maxLng, minLat, minLng, date);
+			//DataPointSet pointSet = DataPointService.getPointsByDayOfWeek(maxLat, maxLng, minLat, minLng, date);
 
+			//TODO: Temporarily using this method for debug purposes
+			DataPointSet pointSet = DataPointService.getPointsNoDate(maxLat, maxLng, minLat, minLng);
+			
 			PrintWriter out = response.getWriter();
 
 			out.println(pointSet.toJSON());
