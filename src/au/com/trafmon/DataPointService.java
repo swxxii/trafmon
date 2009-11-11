@@ -54,8 +54,56 @@ public class DataPointService {
 			});
 
 			DataPointSet pointsSet = new DataPointSet();
+			
+			for(DataPoint dp : dataPoints){
+				DataPoint dataPoint = new DataPoint();
+				dataPoint.setBearing(dp.getBearing());
+				dataPoint.setCal(dp.getCal());
+				dataPoint.setLat(dp.getLat());
+				dataPoint.setLng(dp.getLng());
+				dataPoint.setSpeed(dp.getSpeed());
+				dataPoint.setTag(dp.getTag());
+				pointsSet.addDataPoint(dataPoint);
+			}
 
-			pointsSet.setDataPoints(dataPoints);
+			return pointsSet;
+		} finally {
+			db.close();
+		}
+	}
+	
+	public static DataPointSet getPointsNoDate(final Double maxLat, final Double maxLng, final Double minLat, final Double minLng){
+		ObjectContainer db = Util.openDb();
+
+		try {
+			List<DataPoint> dataPoints = db.query(new Predicate<DataPoint>() {
+				public boolean match(DataPoint candidate) {
+					// Check we are within the bounds specified
+					if ( candidate.getLat() <= maxLat 
+					  && candidate.getLat() >= minLat 
+					  && candidate.getLng() <= maxLng 
+					  && candidate.getLng() >= minLng
+					   ) {
+
+						return true;
+					} else {
+						return false;
+					}
+				}
+			});
+
+			DataPointSet pointsSet = new DataPointSet();
+			
+			for(DataPoint dp : dataPoints){
+				DataPoint dataPoint = new DataPoint();
+				dataPoint.setBearing(dp.getBearing());
+				dataPoint.setCal(dp.getCal());
+				dataPoint.setLat(dp.getLat());
+				dataPoint.setLng(dp.getLng());
+				dataPoint.setSpeed(dp.getSpeed());
+				dataPoint.setTag(dp.getTag());
+				pointsSet.addDataPoint(dataPoint);
+			}
 
 			return pointsSet;
 		} finally {
@@ -109,9 +157,19 @@ public class DataPointService {
 
 			DataPointSet pointsSet = new DataPointSet();
 
-			pointsSet.setDataPoints(dataPoints);
+			for(DataPoint dp : dataPoints){
+				DataPoint dataPoint = new DataPoint();
+				dataPoint.setBearing(dp.getBearing());
+				dataPoint.setCal(dp.getCal());
+				dataPoint.setLat(dp.getLat());
+				dataPoint.setLng(dp.getLng());
+				dataPoint.setSpeed(dp.getSpeed());
+				dataPoint.setTag(dp.getTag());
+				pointsSet.addDataPoint(dataPoint);
+			}
 
 			return pointsSet;
+			
 		} finally {
 			db.close();
 		}

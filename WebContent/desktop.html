@@ -42,9 +42,13 @@
        <p>
            <a href="./CopyOfDb4oServlet">COPY Here is the page that does db stuff</a>
        </p>
-       <p>
-           <a href="./DataGeneratorServlet">Servlet that should send back json version of data points</a>
-       </p>
+       <form name="input" method="post" action="./DataPointServlet">
+       maxLat: <input type="text" name="maxLat" /><br/>
+       maxLng: <input type="text" name="maxLng" /><br/>
+       minLat: <input type="text" name="minLat" /><br/>
+       minLng: <input type="text" name="minLng" /><br/>
+       <input type="submit" value="Fetch points in specified area"/></form>
+       <br/><br/>
        <form name="input" method="post" action="./DataPointServlet">
        Lat: <input type="text" name="lat" /><br/>
        Lng: <input type="text" name="lng" /><br/>
