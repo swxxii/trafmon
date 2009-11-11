@@ -115,7 +115,6 @@ trafmon = {
 	commonMain : function() {
 		// turn on event listeners
 		trafmon.setListeners();
-		alert('Are you sure you want to give us the deed to your house?');
 		trafmon.checkInLocation('DataPointServlet', 44, 33, 22, 11, 'tag');
 	},
 
