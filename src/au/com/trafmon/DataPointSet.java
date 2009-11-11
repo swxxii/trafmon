@@ -23,7 +23,7 @@ public class DataPointSet {
 	}
 	
 	public String toJSON(){
-		String json = "{\"points\": [";
+		String json = "[";
 		
 		Iterator<DataPoint> iter = this.dataPoints.iterator();
 
@@ -47,7 +47,7 @@ public class DataPointSet {
 			}
 		}
 		
-		json += "]}";
+		json += "]";
 		
 		return json;
 	}
