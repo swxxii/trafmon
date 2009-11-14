@@ -55,3 +55,10 @@ hr {
 	text-align: right;
 	width: 270px;
 }
+div.trafficmarker {
+	border: 0px solid;
+	position: absolute;
+	padding: 0px;
+	filter: alpha(opacity = 75);
+	opacity: 0.75;
+}

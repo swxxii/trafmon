@@ -109,23 +109,7 @@ function unHideBlockElement(id) {
 		elem.style.display = "block";
 }
 
-function setDayOpt(elem) {
-	dr = document.getElementById('day_opt_row');
-	newopt = elem.innerHTML;
-	setVal('day_opt', newopt);
-	if (newopt == "<b>Live Traffic</b>") {
-		dr.setAttribute('class', 'arow last');
-		hideElement('time_opt_row');
-	} else {
-		dr.setAttribute('class', 'arow');
-		unHideBlockElement('time_opt_row');
-	}
-}
 
-function setTimeOpt(elem) {
-	newopt = elem.innerHTML;
-	setVal('time_opt', newopt);
-}
 
 /*
  * initialise all the cleared counters (optional)

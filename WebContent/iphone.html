@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="iui/iui/iui.css" type="text/css" />
         <link rel="stylesheet" href="iui/iui/iui-moz.css" type="text/css" />
         <link rel="stylesheet" title="Default" href="iui/iui/t/default/default-theme.css" type="text/css"/>
+        <link rel="stylesheet" href="iphone.css" type="text/css" />
         <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true">
         </script>
         <script type="application/x-javascript" src="iui/iui/iui.js">
@@ -22,18 +23,15 @@
             <a id="fwdButton" class="button" href="#"></a>
         </div>
         <div id="home" title="Home" class="panel" selected="true" fwdtitle="Start TrafMon!" fwdhref="#map_canvas">
-            <!--<h1>Welcome to TrafMon!</h1>
-            <p>
-            Please select your startup options.
-            </p>--><h2>I'm Travelling By</h2>
+            <h2>I'm Travelling By</h2>
             <fieldset>
-                <div class="row" onclick="checkRadio('report_layer_car');hideElement('loc_tag_opts');">
+                <div class="row" onclick="checkRadio('report_layer_car');hideElement('loc_tag_opts');trafmon.options.trafficLayer='car';">
                     <label>
                         Private Car
                     </label>
                     <input type="radio" id="report_layer_car" name="report_layer" value="car" checked="checked" />
                 </div>
-                <div class="row" onclick="checkRadio('report_layer_public');unHideElement('loc_tag_opts');">
+                <div class="row" onclick="checkRadio('report_layer_public');unHideElement('loc_tag_opts');trafmon.options.trafficLayer='pub';">
                     <label>
                         Public Transport 
                     </label>
@@ -44,7 +42,7 @@
                 <h2>Tag Your Route (optional)</h2>
                 <fieldset>
                     <div class="row">
-                        <input class="wide" type="text" name="movie" value="" />
+                        <input class="wide" type="text" name="movie" value="" id="location_tag" onchange="trafmon.options.locationTag=getVal('location_tag');"/>
                     </div>
                 </fieldset>
             </div><h2>Contribute</h2>
@@ -79,7 +77,7 @@
                     <label>
                         Private Cars
                     </label>
-                    <div class="toggle" onclick="" toggled="true">
+                    <div class="toggle" onclick="trafmon.toggleShowCars();" toggled="true" id="show_cars">
                         <span class="thumb"></span>
                         <span class="toggleOn">ON</span>
                         <span class="toggleOff">OFF</span>
@@ -89,7 +87,7 @@
                     <label>
                         Public Transport
                     </label>
-                    <div class="toggle" onclick="" toggled="true">
+                    <div class="toggle" onclick="trafmon.toggleShowPub();" toggled="true" id="show_pub">
                         <span class="thumb"></span>
                         <span class="toggleOn">ON</span>
                         <span class="toggleOff">OFF</span>
@@ -108,45 +106,45 @@
         </div>
         <ul id="day" title="Day of Week">
             <li>
-                <a href="_back" onclick="setDayOpt(this)"><b>Live Traffic</b></a>
+                <a href="_back" onclick="trafmon.setDayOpt(this,-1)"><b>Live Traffic</b></a>
             </li>
             <li>
-                <a href="_back" onclick="setDayOpt(this)">Monday</a>
+                <a href="_back" onclick="trafmon.setDayOpt(this,1)">Monday</a>
             </li>
             <li>
-                <a href="_back" onclick="setDayOpt(this)">Tuesday</a>
+                <a href="_back" onclick="trafmon.setDayOpt(this,2)">Tuesday</a>
             </li>
             <li>
-                <a href="_back" onclick="setDayOpt(this)">Wednesday</a>
+                <a href="_back" onclick="trafmon.setDayOpt(this,3)">Wednesday</a>
             </li>
             <li>
-                <a href="_back" onclick="setDayOpt(this)">Thursday</a>
+                <a href="_back" onclick="trafmon.setDayOpt(this,4)">Thursday</a>
             </li>
             <li>
-                <a href="_back" onclick="setDayOpt(this)">Friday</a>
+                <a href="_back" onclick="trafmon.setDayOpt(this,5)">Friday</a>
             </li>
             <li>
-                <a href="_back" onclick="setDayOpt(this)">Saturday</a>
+                <a href="_back" onclick="trafmon.setDayOpt(this,6)">Saturday</a>
             </li>
             <li>
-                <a href="_back" onclick="setDayOpt(this)">Sunday</a>
+                <a href="_back" onclick="trafmon.setDayOpt(this,0)">Sunday</a>
             </li>
         </ul>
         <ul id="time" title="Time of Day">
             <li>
-                <a href="_back" onclick="setTimeOpt(this)">Early Morning (12 AM - 6 AM)</a>
+                <a href="_back" onclick="trafmon.setTimeOpt(this,0)">Early Morning (12 AM - 6 AM)</a>
             </li>
             <li>
-                <a href="_back" onclick="setTimeOpt(this)">Morning Peak (6 AM - 9 AM)</a>
+                <a href="_back" onclick="trafmon.setTimeOpt(this,1)">Morning Peak (6 AM - 9 AM)</a>
             </li>
             <li>
-                <a href="_back" onclick="setTimeOpt(this)">Daytime (9 AM - 4:30 PM)</a>
+                <a href="_back" onclick="trafmon.setTimeOpt(this,2)">Daytime (9 AM - 4:30 PM)</a>
             </li>
             <li>
-                <a href="_back" onclick="setTimeOpt(this)">Afternoon Peak (4:30 PM - 7 PM)</a>
+                <a href="_back" onclick="trafmon.setTimeOpt(this,3)">Afternoon Peak (4:30 PM - 7 PM)</a>
             </li>
             <li>
-                <a href="_back" onclick="setTimeOpt(this)">Evening (7 PM - 12 AM)</a>
+                <a href="_back" onclick="trafmon.setTimeOpt(this,4)">Evening (7 PM - 12 AM)</a>
             </li>
         </ul>
         <div id="about" title="About" class="panel">
@@ -170,7 +168,8 @@
                     optimised for mobile devices
                 </li>
                 <li>
-                    <b>iUi:</b> an iPhone-style web interface library by Joe Hewitt
+                    <b>iUi:</b>
+                    an iPhone-style web interface library by Joe Hewitt
                 </li>
                 <li>
                     <b>W3C Geolocation API:</b>
