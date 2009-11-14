@@ -507,7 +507,9 @@ trafmon = {
 			maxLat = ne.lat();
 			maxLng = ne.lng();
 			params = "minLat=" + minLat + "&minLng=" + minLng + "&maxLat="
-					+ maxLat + "&maxLng=" + maxLng + "";
+					+ maxLat + "&maxLng=" + maxLng + "" + "&day="
+					+ trafmon.options.dayOfWeek + '&timerange='
+					+ trafmon.options.timeRange;
 			// send request
 			xmlhttp.send(params);
 		}
@@ -548,7 +550,7 @@ trafmon = {
 			// xmlhttp.overrideMimeType("application/json");
 
 			params = "lat=" + lat + "&lng=" + lng + "&bearing=" + bearing
-					+ "&speed=" + speed + "&tag=" + tag + "";
+					+ "&speed=" + speed + "&tag=" + tag;
 			// send request
 			xmlhttp.send(params);
 		}
