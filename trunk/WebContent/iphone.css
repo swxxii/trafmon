@@ -1,0 +1,35 @@
+
+
+#header {
+	background: white;
+	border-bottom: 1px solid #A0B6E6;
+	font-family: helvetica, arial, sans-serif;
+	height: 30px;
+	white-space: nowrap;
+}
+
+#map_canvas {
+	margin: 0 auto;
+	font-size: 14px;
+	text-align: center;
+	vertical-align: middle;
+	background: #e4e3df;
+}
+
+img.loading {
+	margin: 100px 0 0 0;
+	text-align: center
+}
+
+p.loading {
+	text-align: center;
+	font-size: 20px;
+}
+
+div.trafficmarker {
+	border: 0px solid;
+	position: absolute;
+	padding: 0px;
+	filter: alpha(opacity = 75);
+	opacity: 0.75;
+}

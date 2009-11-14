@@ -49,11 +49,103 @@ trafmon = {
 	USER_MARKER : false,
 	FIRST_CENTER : false,
 
-	// location reporting enabled?
-	REPORT_LOCATION : true,
-
-	// list of markers (TrafficMarker objects)
+	// store the list of markers (TrafficMarker objects)
 	markers : [],
+
+	/***************************************************************************
+	 * TrafMon Options (defaults here, changed by GUI)
+	 **************************************************************************/
+	options : {
+		// Front page GUI options
+		trafficLayer : 'car', // car|pub
+		locationTag : '', // any string value
+		reportLocation : true, // boolean
+
+		// 'Options' page options
+		showCarPoints : true, // boolean
+		showPubPoints : true, // boolean
+		dayOfWeek : -1, // -1 = live, 0-6 = sun-sat
+		timeRange : -1
+		// -1 = all day, 0-5 = range
+
+	},
+
+	/**
+	 * Method to toggle option to send location
+	 */
+	toggleReporting : function() {
+		elem = document.getElementById('report_loc');
+		toggled = elem.getAttribute('toggled')
+		if (toggled == 'true')
+			trafmon.options.reportLocation = true;
+		else if (toggled == 'false')
+			trafmon.options.reportLocation = false;
+
+	},
+	/**
+	 * Method to toggle option to show car points
+	 */
+	toggleShowCars : function() {
+		elem = document.getElementById('show_cars');
+		toggled = elem.getAttribute('toggled')
+		if (toggled == 'true')
+			trafmon.options.showCarPoints = true;
+		else if (toggled == 'false')
+			trafmon.options.showCarPoints = false;
+
+	},
+	/**
+	 * Method to toggle option to show public transport points
+	 */
+	toggleShowPub : function() {
+		elem = document.getElementById('show_pub');
+		toggled = elem.getAttribute('toggled')
+		if (toggled == 'true')
+			trafmon.options.showPubPoints = true;
+		else if (toggled == 'false')
+			trafmon.options.showPubPoints = false;
+
+	},
+
+	/**
+	 * Method to set day of week option
+	 * 
+	 * @param {}
+	 *            elem - calling element
+	 * @param {}
+	 *            val - internal int value to set
+	 */
+	setDayOpt : function(elem, val) {
+		// update GUI
+		dr = document.getElementById('day_opt_row');
+		newopt = elem.innerHTML;
+		setVal('day_opt', newopt);
+		if (val == -1) {
+			dr.setAttribute('class', 'arow last');
+			hideElement('time_opt_row');
+		} else {
+			dr.setAttribute('class', 'arow');
+			unHideBlockElement('time_opt_row');
+		}
+		// update internal variable
+		trafmon.options.dayOfWeek = val;
+	},
+
+	/**
+	 * Method to set time of day option
+	 * 
+	 * @param {}
+	 *            elem - calling element
+	 * @param {}
+	 *            val - internal int value to set
+	 */
+	setTimeOpt : function(elem, val) {
+		// update GUI
+		newopt = elem.innerHTML;
+		setVal('time_opt', newopt);
+		// update internal variable
+		trafmon.options.timeRange = val;
+	},
 
 	/***************************************************************************
 	 * METHODS: Google Maps API Initialisation
@@ -155,11 +247,12 @@ trafmon = {
 		// get new bounds
 		bounds = map.getBounds();
 		// invoke json request for points (which then invokes point plotter)
-		trafmon.getPointsJSON('./DataPointServlet', bounds);
+		// trafmon.getPointsJSON('./DataPointServlet', bounds);
+		trafmon.getPointsJSON('data.json', bounds);
 	},
 
 	/**
-	 * Click event listener method
+	 * Click event listener method. Was mainly used to add fake points
 	 * 
 	 * @param {}
 	 *            event: google.maps.MouseClick event
@@ -277,19 +370,6 @@ trafmon = {
 		// document.getElementById('info').innerHTML = msg;
 
 		return true;
-	},
-
-	/**
-	 * toggle option to send location
-	 */
-	toggleReporting : function() {
-		elem = document.getElementById('report_loc');
-		toggled = elem.getAttribute('toggled')
-		if (toggled == 'true')
-			trafmon.REPORT_LOCATION = true;
-		else if (toggled == 'false')
-			trafmon.REPORT_LOCATION = false;
-
 	},
 
 	/***************************************************************************
@@ -485,25 +565,34 @@ trafmon = {
 		// check for valid data
 		if (!points)
 			return false;
-		// first delete all markers (TODO inefficient - should only delete
-		// markers outside new bounds)
+
+		/*
+		 * NOTE: there is no easy way to tell if a marker has already been
+		 * plotted without iterating through the list of existing markers and
+		 * checking each, so we just delete them all. This is terribly
+		 * inefficient due to unneccesary DOM operations.
+		 */
 		for (i = 0; i < trafmon.markers.length; i++) {
-			if (trafmon.markers[i])
-				trafmon.markers[i].setMap(null);
+			// safety check
+			if (!trafmon.markers[i])
+				continue;
+			trafmon.markers[i].setMap(null);
 		}
-		// reset the markers field (hack!)
+		/*
+		 * now we plot all the new markers
+		 */
 		trafmon.markers = [];
-		// plot all new markers (TODO inefficient - should not replot markers
-		// inside bounds which are already plotted, however they may have
-		// changed so we should check for true equality on all points fields)
 		for (i = 0; i < points.length; i++) {
 			// get point coords as LatLng
 			pointLatLng = new google.maps.LatLng(points[i].lat, points[i].lng)
-			// skip points not within bounds - Google are supermega awesome for
-			// their contains() function
+			/*
+			 * new marker OUTSIDE bounds - do not plot
+			 */
 			if (!bounds.contains(pointLatLng))
 				continue;
-			// (else) plot the marker
+			/*
+			 * new marker INSIDE bounds - plot
+			 */
 			trafmon.markers[i] = new TrafficMarker(points[i], map);
 		}
 	},
@@ -628,7 +717,9 @@ trafmon = {
  * Custom traffic speed marker
  * 
  * @param {}
- *            data: object containing {position, speed, bearing, tag}
+ *            data: object containing {position, speed, bearing, tag} optionally
+ *            if the 'own' attribute is set, draws as a beacon
+ * 
  * @param {}
  *            map: GMaps map object
  */
@@ -637,12 +728,15 @@ function TrafficMarker(data, map) {
 	this.latlng_ = new google.maps.LatLng(data.lat, data.lng);
 	// default image dimensions
 	this.imgDim_ = 16;
+	// has this been appended to the DOM? (efficiency)
+	this.domAppend_ = false;
 
-	// if data point is the user's location and not a traffic point
+	// if data point is the user location beacon and not a traffic point
 	if (data.own) {
 		this.image_ = trafmon.IMAGE_BASE_URL + 'beacon.png';
 		this.tagged_ = false;
 		this.imgDim_ = 17;
+		// else its a normal triangle marker
 	} else {
 		this.image_ = trafmon.getMarkerImage(data.bearing, data.speed);
 		this.tagged_ = data.tagged;
@@ -659,28 +753,21 @@ TrafficMarker.prototype = new google.maps.OverlayView();
 
 TrafficMarker.prototype.draw = function() {
 	// Check if the div has been created.
-	var div = this.div_;
-	if (!div) {
-
-		// TODO replace the DOM stuff with text???
-
-		// Create a overlay text DIV
-		div = this.div_ = document.createElement('DIV');
-		// set various attributes
-		div.style.border = "0px solid none";
-		div.style.position = "absolute";
-		div.style.padding = "0px";
-		// div.style.cursor = 'pointer'; // nb only affects desktop
-		div.style.width = this.imgDim_ + 'px';
-		div.style.height = this.imgDim_ + 'px';
-		div.style.background = 'url(' + this.image_ + ') no-repeat';
-		div.style.filter = "alpha(opacity=75)"; // firefox
-		div.style.opacity = "0.75"; // IE
-
-		// create IMG inside DIV
-		// var img = document.createElement("IMG");
-		// img.src = this.image_;
-		// div.appendChild(img);
+	if (!this.div_) {
+		// get pixel point of latlng
+		var point = this.getProjection().fromLatLngToDivPixel(this.latlng_);
+		// make div element
+		this.div_ = document.createElement('div');
+		// set class to add static css
+		this.div_.setAttribute('class', 'trafficmarker');
+		// construct style attribute. joining arrays is faster than using the
+		// '+' concat. operator according to the interwebs
+		var styleparts = ['width:', this.imgDim_, 'px;height:', this.imgDim_,
+				'px;background:url(', this.image_, ') no-repeat;left:',
+				(point.x - Math.floor(this.imgDim_ / 2)), 'px;top:',
+				(point.y - Math.floor(this.imgDim_ / 2)), 'px;'];
+		// set style attribute
+		this.div_.setAttribute('style', styleparts.join(''));
 
 		// TODO implement location tagging! only need this when object has
 		// location tag
@@ -690,35 +777,11 @@ TrafficMarker.prototype.draw = function() {
 		// });
 		// }
 
-		// Add the overlay to the DOM
-		var panes = this.getPanes();
-		panes.overlayImage.appendChild(div);
 	}
 
-	// Position the overlay
-	var point = this.getProjection().fromLatLngToDivPixel(this.latlng_);
-	if (point) {
-		// subtract width/2 to center the image at LatLng
-		div.style.left = (point.x - Math.floor(this.imgDim_ / 2)) + 'px';
-		div.style.top = (point.y - Math.floor(this.imgDim_ / 2)) + 'px';
-	}
-};
-
-/**
- * updates the marker with new position and redraws
- * 
- * @param {}
- *            data
- */
-TrafficMarker.prototype.update = function(data) {
-	this.latlng_ = new google.maps.LatLng(data.lat, data.lng);
-	// Position the overlay
-	var point = this.getProjection().fromLatLngToDivPixel(this.latlng_);
-	if (point) {
-		// subtract 5 to center the image
-		div.style.left = (point.x - 5) + 'px';
-		div.style.top = (point.y) - 5 + 'px';
-	}
+	// Add the overlay to the DOM
+	var panes = this.getPanes();
+	panes.overlayImage.appendChild(this.div_);
 
 };
 
