@@ -205,8 +205,8 @@ public class DataPointService {
 					  && candidate.getLng() >= minLng
 					  && curCal.get(Calendar.YEAR) == requestTime.get(Calendar.YEAR)
 					  && curCal.get(Calendar.DAY_OF_YEAR) == requestTime.get(Calendar.DAY_OF_YEAR)
-					  //TODO: This needs fixing to actually get useful points
-					  && curCal.get(Calendar.HOUR_OF_DAY) == requestTime.get(Calendar.HOUR_OF_DAY)
+					  && curCal.getTimeInMillis() > requestTime.getTimeInMillis() - 1800000
+					  && curCal.getTimeInMillis() <= requestTime.getTimeInMillis()
 					   ) {
 
 						return true;
