@@ -64,9 +64,8 @@ trafmon = {
 		// 'Options' page options
 		showCarPoints : true, // boolean
 		showPubPoints : true, // boolean
-		dayOfWeek : -1, // -1 = live, 0-6 = sun-sat
-		timeRange : -1
-		// -1 = all day, 0-5 = range
+		dayOfWeek : 0, // 0 = live, 1-7 = sun-sat
+		timeRange : -1 // -1 = all day, 0-4 = range
 
 	},
 
@@ -247,8 +246,8 @@ trafmon = {
 		// get new bounds
 		bounds = map.getBounds();
 		// invoke json request for points (which then invokes point plotter)
-		// trafmon.getPointsJSON('./DataPointServlet', bounds);
-		trafmon.getPointsJSON('data.json', bounds);
+		trafmon.getPointsJSON('./DataPointServlet', bounds);
+		//trafmon.getPointsJSON('data.json', bounds);
 	},
 
 	/**

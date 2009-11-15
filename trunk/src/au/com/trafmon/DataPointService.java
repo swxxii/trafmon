@@ -197,6 +197,9 @@ public class DataPointService {
 			List<DataPoint> dataPoints = db.query(new Predicate<DataPoint>() {
 				public boolean match(DataPoint candidate) {
 					GregorianCalendar curCal = candidate.getCal();
+					
+					int year = curCal.get(Calendar.YEAR);
+					
 					// Check we are within the bounds specified, and within the hour specified.
 					// Currently this will get all points, for example, that were made today within 30mins of the current time
 					if ( candidate.getLat() <= maxLat 
