@@ -38,7 +38,7 @@ public class DataPointServlet extends HttpServlet {
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+
 		if (request.getParameter("lat") != null) {
 
 			ObjectContainer db = Util.openDb();
@@ -75,27 +75,65 @@ public class DataPointServlet extends HttpServlet {
 			final Double minLat = Double.parseDouble(request.getParameter("minLat"));
 			final Double minLng = Double.parseDouble(request.getParameter("minLng"));
 
-			//TODO
-			// Here i am creating a date from the current time in
-			// milliseconds since January 1, 1970, 00:00:00 GMT
-			// I dont claim that this is the best format, and it
-			// could well change it in the future
-			// (its easy to make it parse a string for example)
-			//Date date = new Date(Long.parseLong(request.getParameter("date")));
-			Date date = new Date();
+			DataPointSet pointSet = null;
 
-			// As you can see by the method used, this will return all points
-			// that occur on the given day of the week (Monday, tuesday ect)
-			// during the given hour
-			//DataPointSet pointSet = DataPointService.getPointsByDayOfWeek(maxLat, maxLng, minLat, minLng, date);
+			//If we get in here, we are trying to get traffic for a specific day and time range
+			if((request.getParameter("day") != null) && (Integer.parseInt(request.getParameter("day")) != 0) && (request.getParameter("timerange") != null)) {
 
-			//TODO: Temporarily using this method for debug purposes
-			DataPointSet pointSet = DataPointService.getPointsNoDate(maxLat, maxLng, minLat, minLng);
-			
+				int startHour = 0;
+				int endHour = 24;
+				int timerange = Integer.parseInt(request.getParameter("timerange"));
+				int day = Integer.parseInt(request.getParameter("day"));
+
+				switch(timerange){
+				
+				case -1:
+					startHour = 0;
+					endHour = 24;
+
+				case 0:
+					startHour = 0;
+					endHour = 6;
+					break;
+
+				case 1:
+					startHour = 6;
+					endHour = 9;
+					break;
+
+				case 2:
+					startHour = 9;
+					endHour = 16;
+					break;
+
+				case 3:
+					startHour = 16;
+					endHour = 19;
+					break;
+
+				case 4:
+					startHour = 19;
+					endHour = 24;
+					break;
+				}
+				pointSet = DataPointService.getPointsByDayOfWeekAndTimeRange(maxLat, maxLng, minLat, minLng, day, startHour, endHour);
+			}else{
+
+				//If we are in here we are getting live traffic!
+
+				Date date = new Date();
+
+				pointSet = DataPointService.getPointsByDate(maxLat, maxLng, minLat, minLng, date);
+			}
+
 			PrintWriter out = response.getWriter();
 
 			out.println(pointSet.toJSON());
+
+
+
 		}
 	}
+
 
 }
