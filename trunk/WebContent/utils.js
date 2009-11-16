@@ -89,7 +89,7 @@ function checkRadio(id) {
 		elem.checked = true;
 }
 
-function setSelect(idval) {
+function setSelect(id, val) {
 	elem = document.getElementById(id);
 	for (i = 0; i < elem.options.length; i++) {
 		if (elem.options[i].value == val)
@@ -111,6 +111,19 @@ function unHideBlockElement(id) {
 	elem = document.getElementById(id);
 	if (elem)
 		elem.style.display = "block";
+}
+
+/**
+ * [en/dis]ables form elements
+ * 
+ * @param {}
+ *            id: id of the element
+ * @param {}
+ *            val: true/false = enabled?
+ */
+function ableElement(id, val) {
+	elem = document.getElementById(id);
+	elem.disabled = !val;
 }
 
 /*
