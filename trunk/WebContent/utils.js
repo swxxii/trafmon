@@ -55,9 +55,7 @@ function getVal(id) {
 		case 'INPUT' :
 			return elem.value;
 		case 'SELECT' :
-			indx = elem.selectedIndex;
-			optelem = elem.options[indx];
-			return optelem.id;
+			return elem.selectedIndex.valueOf();
 		default :
 			return false;
 	}

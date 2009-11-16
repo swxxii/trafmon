@@ -84,26 +84,42 @@ trafmon = {
 	},
 	/**
 	 * Method to toggle option to show car points
+	 * 
+	 * @param desktop:
+	 *            (boolean) are we calling from the desktop version
 	 */
-	toggleShowCars : function() {
-		elem = document.getElementById('show_cars');
-		toggled = elem.getAttribute('toggled')
-		if (toggled == 'true')
-			trafmon.options.showCarPoints = true;
-		else if (toggled == 'false')
-			trafmon.options.showCarPoints = false;
+	toggleShowCars : function(desktop) {
+		if (desktop) {
+			trafmon.options.showCarPoints = isChecked('show_cars');
+			// alert(isChecked('show_cars'));
+		} else {
+			elem = document.getElementById('show_cars');
+			toggled = elem.getAttribute('toggled')
+			if (toggled == 'true')
+				trafmon.options.showCarPoints = true;
+			else if (toggled == 'false')
+				trafmon.options.showCarPoints = false;
+		}
 
 	},
 	/**
 	 * Method to toggle option to show public transport points
+	 * 
+	 * @param desktop:
+	 *            (boolean) are we calling from the desktop version
 	 */
-	toggleShowPub : function() {
-		elem = document.getElementById('show_pub');
-		toggled = elem.getAttribute('toggled')
-		if (toggled == 'true')
-			trafmon.options.showPubPoints = true;
-		else if (toggled == 'false')
-			trafmon.options.showPubPoints = false;
+	toggleShowPub : function(desktop) {
+		if (desktop) {
+			trafmon.options.showPubPoints = isChecked('show_public');
+			// alert(isChecked('show_public'));
+		} else {
+			elem = document.getElementById('show_pub');
+			toggled = elem.getAttribute('toggled')
+			if (toggled == 'true')
+				trafmon.options.showPubPoints = true;
+			else if (toggled == 'false')
+				trafmon.options.showPubPoints = false;
+		}
 
 	},
 
@@ -132,6 +148,14 @@ trafmon = {
 	},
 
 	/**
+	 * Sets the day option for desktop GUI (much simpler on desktop!)
+	 */
+	setDayOptDesktop : function() {
+		trafmon.options.dayOfWeek = getVal('day');
+		alert(trafmon.options.dayOfWeek);
+	},
+
+	/**
 	 * Method to set time of day option
 	 * 
 	 * @param {}
@@ -146,6 +170,16 @@ trafmon = {
 		// update internal variable
 		trafmon.options.timeRange = val;
 	},
+	
+		/**
+	 * Sets the time range option for desktop GUI (much simpler on desktop!)
+	 */
+	setTimeOptDesktop : function() {
+		trafmon.options.timeRange = getVal('timerange');
+		alert(trafmon.options.timeRange);
+	},
+	
+	
 
 	/***************************************************************************
 	 * METHODS: Google Maps API Initialisation
