@@ -170,10 +170,15 @@ trafmon = {
 		val = getVal('day');
 		trafmon.options.dayOfWeek = val;
 		alert(trafmon.options.dayOfWeek);
-		// if select 'live traffic' (0), reset the time option (incl. internal)
+		// if select 'live traffic' (0), disable the timerange dropdown
 		if (val == 0) {
-			setSelect('timerange', -1);
+			ableElement('timerange', false);
+			setSelect('timerange',-1);
 			trafmon.options.timeRange = -1;
+		}
+		// if select day, enable timerange dropdown
+		else {
+			ableElement('timerange', true);
 		}
 		// trigger map to reload points as option changed
 		google.maps.event.trigger(map, 'idle');
@@ -194,6 +199,11 @@ trafmon = {
 		setVal('time_opt', newopt);
 		// update internal variable
 		trafmon.options.timeRange = val;
+		// if select 'live traffic' (-1), reset the day option (incl. internal)
+		if (val == -1) {
+			setSelect('day', 0);
+			trafmon.options.dayOfWeek = 0;
+		}
 		// trigger map to reload points as option changed
 		google.maps.event.trigger(map, 'idle');
 
