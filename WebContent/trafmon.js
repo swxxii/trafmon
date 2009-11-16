@@ -57,7 +57,7 @@ trafmon = {
 	 **************************************************************************/
 	options : {
 		// Front page GUI options
-		trafficLayer : 'car', // car|pub
+		trafficLayer : 1, // 1=car, 2=public
 		locationTag : '', // any string value
 		reportLocation : true, // boolean
 
@@ -65,7 +65,8 @@ trafmon = {
 		showCarPoints : true, // boolean
 		showPubPoints : true, // boolean
 		dayOfWeek : 0, // 0 = live, 1-7 = sun-sat
-		timeRange : -1 // -1 = all day, 0-4 = range
+		timeRange : -1
+		// -1 = all day, 0-4 = range
 
 	},
 
@@ -247,7 +248,7 @@ trafmon = {
 		bounds = map.getBounds();
 		// invoke json request for points (which then invokes point plotter)
 		trafmon.getPointsJSON('./DataPointServlet', bounds);
-		//trafmon.getPointsJSON('data.json', bounds);
+		// trafmon.getPointsJSON('data.json', bounds);
 	},
 
 	/**
@@ -468,7 +469,8 @@ trafmon = {
 	 **************************************************************************/
 
 	/**
-	 * Fetch some marker points using Ajax request
+	 * Fetch some marker points using Ajax request. Uses the trafmon internal
+	 * options to filter which points to get (e.g. which layer)
 	 * 
 	 * @param {}
 	 *            url: location to load (must be on same server)
@@ -505,25 +507,37 @@ trafmon = {
 			minLng = sw.lng();
 			maxLat = ne.lat();
 			maxLng = ne.lng();
+			/*
+			 * calculate layer to retrieve. 1=cars only, 2=pub only, 3=both
+			 * (treat like a bitfield)
+			 */
+			var layer = trafmon.options.showCarPoints ? 1 : 0
+					+ trafmon.options.showPubPoints ? 2 : 0;
 			params = "minLat=" + minLat + "&minLng=" + minLng + "&maxLat="
 					+ maxLat + "&maxLng=" + maxLng + "" + "&day="
 					+ trafmon.options.dayOfWeek + '&timerange='
-					+ trafmon.options.timeRange;
+					+ trafmon.options.timeRange + "&layer=" + layer;
 			// send request
 			xmlhttp.send(params);
 		}
 	},
 
 	/**
-	 * Fetch some marker points using Ajax request
+	 * Report user location to database
 	 * 
 	 * @param {}
 	 *            url: location of servlet waiting to recieve (must be on same
-	 *            server) lat: users lattitude lng: users longitude bearing:
-	 *            users bearing speed: users speed tag: information about users
-	 *            travel mode. For example train number.
+	 *            server)
 	 * @param {}
-	 *            bounds: google maps LatLngBounds object
+	 *            lat: users latitude
+	 * @param {}
+	 *            lng: users longitude
+	 * @param {}
+	 *            bearing: user's bearing in degrees
+	 * @param {}
+	 *            speed: user's speed in km/h (nearest int)
+	 * @param {}
+	 *            tag: information about users travel mode, e.g. train number.
 	 */
 	checkInLocation : function(url, lat, lng, bearing, speed, tag) {
 		// create request object
@@ -549,7 +563,8 @@ trafmon = {
 			// xmlhttp.overrideMimeType("application/json");
 
 			params = "lat=" + lat + "&lng=" + lng + "&bearing=" + bearing
-					+ "&speed=" + speed + "&tag=" + tag;
+					+ "&speed=" + speed + "&tag=" + tag + "&layer="
+					+ trafmon.options.trafficLayer;
 			// send request
 			xmlhttp.send(params);
 		}
