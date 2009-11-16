@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.com.trafmon.DataPoint.Layer;
+
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 
@@ -58,8 +60,9 @@ public class DataPointServlet extends HttpServlet {
 				int bearing = Integer.parseInt(request.getParameter("bearing"));
 				int speed = Integer.parseInt(request.getParameter("speed"));
 				String tag = request.getParameter("tag");
+				Layer layer = ( Integer.parseInt(request.getParameter("layer")) == 1 ) ? Layer.CAR : Layer.PUBLIC ;
 
-				DataPoint newPoint = new DataPoint(lat, lng, bearing, speed, tag, new Date());
+				DataPoint newPoint = new DataPoint(lat, lng, bearing, speed, tag, new Date(), layer);
 
 				DataPointSet pointSet = new DataPointSet(newPoint);
 
@@ -80,6 +83,7 @@ public class DataPointServlet extends HttpServlet {
 			final Double maxLng = Double.parseDouble(request.getParameter("maxLng"));
 			final Double minLat = Double.parseDouble(request.getParameter("minLat"));
 			final Double minLng = Double.parseDouble(request.getParameter("minLng"));
+			final Layer layer = ( Integer.parseInt(request.getParameter("layer")) == 1 ) ? Layer.CAR : Layer.PUBLIC ;
 
 			DataPointSet pointSet = null;
 
@@ -122,14 +126,14 @@ public class DataPointServlet extends HttpServlet {
 					endHour = 24;
 					break;
 				}
-				pointSet = DataPointService.getPointsByDayOfWeekAndTimeRange(maxLat, maxLng, minLat, minLng, day, startHour, endHour);
+				pointSet = DataPointService.getPointsByDayOfWeekAndTimeRange(maxLat, maxLng, minLat, minLng, day, startHour, endHour, layer);
 			}else{
 
 				//If we are in here we are getting live traffic!
 
 				Date date = new Date();
 
-				pointSet = DataPointService.getPointsByDate(maxLat, maxLng, minLat, minLng, date);
+				pointSet = DataPointService.getPointsByDate(maxLat, maxLng, minLat, minLng, date, layer);
 			}
 
 			PrintWriter out = response.getWriter();

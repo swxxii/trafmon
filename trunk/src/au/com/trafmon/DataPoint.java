@@ -5,6 +5,8 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class DataPoint {
+	
+	public enum Layer { CAR, PUBLIC }
 
 	private double lat;
 	private double lng;
@@ -12,8 +14,9 @@ public class DataPoint {
 	private int speed;
 	private String tag;
 	private GregorianCalendar cal;
+	private Layer layer;
 
-	public DataPoint(double lat, double lng, int bearing, int speed, String tag, GregorianCalendar date) {
+	public DataPoint(double lat, double lng, int bearing, int speed, String tag, GregorianCalendar date, Layer layer) {
 		super();
 		this.lat = lat;
 		this.lng = lng;
@@ -21,9 +24,10 @@ public class DataPoint {
 		this.speed = speed;
 		this.tag = tag;
 		this.cal = date;
+		this.layer = layer;
 	}
 
-	public DataPoint(double lat, double lng, int bearing, int speed, String tag, Date date) {
+	public DataPoint(double lat, double lng, int bearing, int speed, String tag, Date date, Layer layer) {
 		super();
 		this.lat = lat;
 		this.lng = lng;
@@ -35,6 +39,8 @@ public class DataPoint {
 		GregorianCalendar newCal = new GregorianCalendar(tz);
 		newCal.setTime(date);
 		this.cal = newCal;
+		
+		this.layer = layer;
 	}
 
 	public DataPoint() {
@@ -87,6 +93,14 @@ public class DataPoint {
 
 	public void setCal(GregorianCalendar cal) {
 		this.cal = cal;
+	}
+
+	public Layer getLayer() {
+		return layer;
+	}
+
+	public void setLayer(Layer layer) {
+		this.layer = layer;
 	}
 
 }
