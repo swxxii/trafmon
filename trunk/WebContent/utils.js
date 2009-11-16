@@ -87,9 +87,15 @@ function checkRadio(id) {
 	elem = document.getElementById(id);
 	if (elem)
 		elem.checked = true;
-
 }
 
+function setSelect(id, val) {
+	elem = document.getElementById(id);
+	for (i = 0; i < elem.options.length; i++) {
+		if (elem.options[i].value == val)
+			elem.selectedIndex = i;
+	}
+}
 function hideElement(id) {
 	elem = document.getElementById(id);
 	if (elem)
@@ -106,8 +112,6 @@ function unHideBlockElement(id) {
 	if (elem)
 		elem.style.display = "block";
 }
-
-
 
 /*
  * initialise all the cleared counters (optional)

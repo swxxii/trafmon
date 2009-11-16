@@ -155,6 +155,7 @@ trafmon = {
 		} else {
 			dr.setAttribute('class', 'arow');
 			unHideBlockElement('time_opt_row');
+
 		}
 		// update internal variable
 		trafmon.options.dayOfWeek = val;
@@ -167,8 +168,14 @@ trafmon = {
 	 * Sets the day option for desktop GUI (much simpler on desktop!)
 	 */
 	setDayOptDesktop : function() {
-		trafmon.options.dayOfWeek = getVal('day');
+		val = getVal('day');
+		trafmon.options.dayOfWeek = val;
 		alert(trafmon.options.dayOfWeek);
+		// if select 'live traffic' (0), reset the time option (incl. internal)
+		if (val == 0) {
+			setSelect('timerange', -1);
+			trafmon.options.timeRange = -1;
+		}
 		// trigger map to reload points as option changed
 		google.maps.event.trigger(map, 'idle');
 
