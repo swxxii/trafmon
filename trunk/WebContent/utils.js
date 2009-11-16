@@ -89,7 +89,7 @@ function checkRadio(id) {
 		elem.checked = true;
 }
 
-function setSelect(id, val) {
+function setSelect(idval) {
 	elem = document.getElementById(id);
 	for (i = 0; i < elem.options.length; i++) {
 		if (elem.options[i].value == val)
@@ -174,4 +174,22 @@ function iPhoneRedirect(url, url2) {
 		window.location = url;
 	} else
 		window.location = url2;
+}
+
+/**
+ * extra math functions
+ */
+// convert degrees to radians
+function toRad(num) {
+	return num * Math.PI / 180;
+}
+
+// convert radians to degrees (signed)
+function toDeg(num) {
+	return num * 180 / Math.PI;
+}
+
+// convert radians to degrees (as bearing: 0...360)
+function toBearing(num) {
+	return (toDeg(num) + 360) % 360;
 }

@@ -44,16 +44,15 @@ trafmon = {
 			longitude : 144.964685
 		}
 	},
-	
+
 	previousPosition : {
 		coords : {
 			latitude : -37.798985,
 			longitude : 144.964685
 		}
 	},
-	
-	previousTime : 0,
-	
+
+	previousTime : (new Date()).getTime(),
 
 	// marker for user's position
 	USER_MARKER : false,
@@ -396,77 +395,94 @@ trafmon = {
 	 * position updates, so don't want to do too much in here!
 	 */
 	watchPositionSuccess : function(position) {
-	    trafmon.previousposition = trafmon.position;
-        
 
-   
-        var d = Date();
-        var currentTime = d.getTime();
-        var timeDifference = currentTime = previousTime;
-	    
-	    if((timeDifference) >= 5000)
-	    {
-	        var speed = calculateSpeed(position,oldPosition,timeDifference);
-	        var bearing = calculateBearing(position,oldPosition);
-	    
-	        trafmon.previousTime = currentTime;
-	        
-	        checkInLocation("./DataPointServlet", trafmon.position.lattitude, trafmon.position.lingitude, bearing, speed, tag);
-	        
-	    }
-	    
-	    
-	    //trafmon.previoustime = d.Date(); 
-	    
-		// update internal position object
+		// update internal position object with new position
 		trafmon.setPosition(position);
-		
+		// redraw the user position marker (every time)
+		trafmon.updateUserMarker();
+
+		/*
+		 * SPEED AND BEARING CALCULATIONS
+		 */
+
+		var d = new Date();
+		var currentTime = d.getTime();
+		var timeDifference = currentTime - trafmon.previousTime;
+
+		// only want to run every X seconds
+		// if ((timeDifference) >= trafmon.MILLIS_BETWEEN_CHECKIN) {
+		if ((timeDifference) >= 6000) {
+
+			// alert(trafmon.previousPosition + '\n'+position);
+
+			// calc speed & bearing
+			var speed = trafmon.calculateSpeed(position,
+					trafmon.previousPosition, timeDifference);
+			var bearing = trafmon.calculateBearing(position,
+					trafmon.previousPosition);
+
+			alert(speed + "\n" + bearing);
+
+			// reset time counter
+			trafmon.previousTime = currentTime;
+			// reset 'position X seconds ago' to current position
+			trafmon.setPrevPosition(trafmon.position);
+
+			// trafmon.checkInLocation("./DataPointServlet",
+			// trafmon.position.latitude, trafmon.position.longitude,
+			// bearing, speed, trafmon.options.locationTag);
+
+		}
+
+		// center map ONCE at startup
 		if (!trafmon.MAP_CENTERED_ONCE) {
-			// center map
 			map.set_center(trafmon.getPositionLatLng());
 			trafmon.MAP_CENTERED_ONCE = true;
 		}
-		// redraw the user position marker
-		trafmon.updateUserMarker();
+
 	},
 
 	calculateSpeed : function(position, oldPosition, timeDif) {
-	    var lat1 = position.lattitude;
-	    var lat2 = oldPosition.lattitude;
-        var lon1 = position.longitude;
-	    var lon2 = oldPosition.longitude;
+		// lat 1 has to be old position
+		var lat1 = oldPosition.latitude;
+		var lon1 = oldPosition.longitude;
+		// lat2 has to be current (new) position
+		var lat2 = position.latitude;
+		var lon2 = position.longitude;
+		// calculate individual distances
+		var dLat = toRad(lat2 - lat1);
+		var dLon = toRad(lon2 - lon1);
 
-        var R = 6371; // km
-        var dLat = (lat2-lat1).toRad();
-        var dLon = (lon2-lon1).toRad(); 
-        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2); 
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        var d = R * c;
+		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1))
+				* Math.cos(toRad(lat2)) * Math.sin(dLon / 2)
+				* Math.sin(dLon / 2);
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		var R = 6371; // km
+		var dist = R * c;
 
-        /* timeDif is in milliseconds so */
-        var timeDifInHours = timeDif/3600000;
+		/* timeDif is in milliseconds so */
+		var timeDifInHours = timeDif / 3600000;
 
-        return d/timeDifInHours;
+		// return speed as distance(km)/time(h)
+		return dist / timeDifInHours;
 
-    },
+	},
 
+	calculateBearing : function(position, oldPosition) {
+		var lat1 = oldPosition.latitude;
+		var lon1 = oldPosition.longitude;
+		var lat2 = position.latitude;
+		var lon2 = position.longitude;
+		var dLat = toRad(lat2 - lat1);
+		var dLon = toRad(lon2 - lon1);
 
-    calculateBearing : function(position,oldPosition) {
-        var lat1 = position.lattitude;
-	    var lat2 = oldPosition.lattitude;
-        var lon1 = position.longitude;
-	    var lon2 = oldPosition.longitude;
-    
-        var y = Math.sin(dLon) * Math.cos(lat2);
-        var x = Math.cos(lat1)*Math.sin(lat2) -
-        Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
-        var brng = Math.atan2(y, x).toBrng();
+		var y = Math.sin(dLon) * Math.cos(lat2);
+		var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
+				* Math.cos(lat2) * Math.cos(dLon);
+		var brng = toBearing(Math.atan2(y, x));
 
-        return brng;
-    },
-
+		return brng;
+	},
 
 	/**
 	 * Watcher position fail - called when could not get location. currently
@@ -759,15 +775,16 @@ trafmon = {
 	setPosition : function(position) {
 		trafmon.position = position;
 	},
-	
-	///**
+	setPrevPosition : function(position) {
+		trafmon.previousPosition = position;
+	},
+
+	// /**
 	// * Set the position given a position object from the geolocation API
 	// */
-	//setPreviousPosition : function(position) {
-	//	trafmon.previousposition = position;
-	//},
-	
-	
+	// setPreviousPosition : function(position) {
+	// trafmon.previousposition = position;
+	// },
 
 	/**
 	 * Returns the internal position as a Google Maps LatLng object
