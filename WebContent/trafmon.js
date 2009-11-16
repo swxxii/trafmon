@@ -91,7 +91,7 @@ trafmon = {
 	toggleShowCars : function(desktop) {
 		if (desktop) {
 			trafmon.options.showCarPoints = isChecked('show_cars');
-			// alert(isChecked('show_cars'));
+			alert(trafmon.options.showCarPoints);
 		} else {
 			elem = document.getElementById('show_cars');
 			toggled = elem.getAttribute('toggled')
@@ -111,7 +111,7 @@ trafmon = {
 	toggleShowPub : function(desktop) {
 		if (desktop) {
 			trafmon.options.showPubPoints = isChecked('show_public');
-			// alert(isChecked('show_public'));
+			alert(trafmon.options.showPubPoints);
 		} else {
 			elem = document.getElementById('show_pub');
 			toggled = elem.getAttribute('toggled')
