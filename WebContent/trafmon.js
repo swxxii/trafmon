@@ -80,7 +80,6 @@ trafmon = {
 			trafmon.options.reportLocation = true;
 		else if (toggled == 'false')
 			trafmon.options.reportLocation = false;
-
 	},
 	/**
 	 * Method to toggle option to show car points
@@ -100,6 +99,8 @@ trafmon = {
 			else if (toggled == 'false')
 				trafmon.options.showCarPoints = false;
 		}
+		// trigger map to reload points as option changed
+		google.maps.event.trigger(map, 'idle');
 
 	},
 	/**
@@ -120,6 +121,8 @@ trafmon = {
 			else if (toggled == 'false')
 				trafmon.options.showPubPoints = false;
 		}
+		// trigger map to reload points as option changed
+		google.maps.event.trigger(map, 'idle');
 
 	},
 
@@ -145,6 +148,9 @@ trafmon = {
 		}
 		// update internal variable
 		trafmon.options.dayOfWeek = val;
+		// trigger map to reload points as option changed
+		google.maps.event.trigger(map, 'idle');
+
 	},
 
 	/**
@@ -153,6 +159,9 @@ trafmon = {
 	setDayOptDesktop : function() {
 		trafmon.options.dayOfWeek = getVal('day');
 		alert(trafmon.options.dayOfWeek);
+		// trigger map to reload points as option changed
+		google.maps.event.trigger(map, 'idle');
+
 	},
 
 	/**
@@ -169,17 +178,20 @@ trafmon = {
 		setVal('time_opt', newopt);
 		// update internal variable
 		trafmon.options.timeRange = val;
+		// trigger map to reload points as option changed
+		google.maps.event.trigger(map, 'idle');
+
 	},
-	
-		/**
+
+	/**
 	 * Sets the time range option for desktop GUI (much simpler on desktop!)
 	 */
 	setTimeOptDesktop : function() {
 		trafmon.options.timeRange = getVal('timerange');
 		alert(trafmon.options.timeRange);
+		// trigger map to reload points as option changed
+		google.maps.event.trigger(map, 'idle');
 	},
-	
-	
 
 	/***************************************************************************
 	 * METHODS: Google Maps API Initialisation
