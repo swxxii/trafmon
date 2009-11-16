@@ -9,12 +9,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.db4o.ObjectContainer;
-import com.db4o.query.Predicate;
-
 import au.com.trafmon.DataPoint;
 import au.com.trafmon.DataPointSet;
 import au.com.trafmon.Util;
+import au.com.trafmon.DataPoint.Layer;
+
+import com.db4o.ObjectContainer;
+import com.db4o.query.Predicate;
 
 /**
  * Servlet implementation class DataGenerator
@@ -63,8 +64,8 @@ public class DataGeneratorServlet extends HttpServlet {
 				String type = (String)request.getParameter("data");
 
 				if(type.equals("melbUni")){
-					DataPoint dp1 = new DataPoint(-37.800098, 144.961077, 1, 5, null, new GregorianCalendar());
-					DataPoint dp2 = new DataPoint(-37.800013, 144.960154, 2, 4, null, new GregorianCalendar());
+					DataPoint dp1 = new DataPoint(-37.800098, 144.961077, 1, 5, null, new GregorianCalendar(), Layer.CAR);
+					DataPoint dp2 = new DataPoint(-37.800013, 144.960154, 2, 4, null, new GregorianCalendar(), Layer.CAR);
 					db.store(dp1);
 					db.store(dp2);
 				}
