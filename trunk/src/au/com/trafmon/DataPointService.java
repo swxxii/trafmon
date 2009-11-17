@@ -21,6 +21,27 @@ import com.db4o.query.Predicate;
 public class DataPointService {
 	
 	/**
+	 * 
+	 * This method saves a given DataPoint
+	 * 
+	 * @param dp
+	 * @return
+	 */
+	public static DataPoint savePoint(DataPoint dp){
+		
+		ObjectContainer db = Util.openDb();
+		
+		try {
+			db.store(dp);
+		} finally {
+			db.close();
+		}
+		
+		return new DataPoint(dp);
+	}
+	
+	
+	/**
 	 * This method returns all points on a given day of the week during a given hour
 	 * within the given bounds and on the specified layer
 	 * 
