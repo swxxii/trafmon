@@ -331,8 +331,8 @@ trafmon = {
 		tel = document.createElement('table');
 		tel.setAttribute('id', 'telemetry');
 
-		tel.style.left = parseInt(canvas.clientWidth) - 105 + 'px';
-		tel.style.top = '28px';
+		tel.style.left = '5px';
+		tel.style.top = '5px';
 
 		tel.innerHTML = '<tr><td colspan="2"><b>Telemetry</b></td></tr>'
 				+ '<tr><td>Speed</td><td id="tel_speed">n/a</td></tr>'
@@ -363,7 +363,8 @@ trafmon = {
 	},
 
 	/**
-	 * updates position of telemetry when phone rotated.
+	 * updates position of telemetry when phone rotated. Not needed since we
+	 * moved the location of telemetry box
 	 */
 	rotateTelemetry : function() {
 		if (!trafmon.onPhone)
