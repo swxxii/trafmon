@@ -52,14 +52,10 @@ public class DataPointServlet extends HttpServlet {
 		//Need to set up db4o to handle java calendars properly.
 		Db4o.configure().objectClass(GregorianCalendar.class).callConstructor(true);
 
-
-
 		if (request.getParameter("lat") != null) {
+			
 			// Here we have a post request to store a point
-			ObjectContainer db = Util.openDb();
-
-			try {
-
+		
 				//Set up the variables
 				double lat = Double.parseDouble(request.getParameter("lat"));
 				double lng = Double.parseDouble(request.getParameter("lng"));
@@ -72,16 +68,11 @@ public class DataPointServlet extends HttpServlet {
 				DataPoint newPoint = new DataPoint(lat, lng, bearing, speed, tag, new Date(), layer);
 
 				//Store the data point
-				db.store(newPoint);
+				DataPointSet pointSet = new DataPointSet(DataPointService.savePoint(newPoint));
 				
 				// Return the new point, so the client can verify it if they wish.
-				DataPointSet pointSet = new DataPointSet(newPoint);			
 				PrintWriter out = response.getWriter();
 				out.println(pointSet.toJSON());
-
-			} finally {
-				db.close();
-			}
 
 		} else if (request.getParameter("maxLat") != null) {
 			// Here we have a post request to return a number of points
