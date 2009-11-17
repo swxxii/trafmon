@@ -296,7 +296,6 @@
 		setTimeout(scrollTo, 100, 0, 1);
 		// trafmon- resize map div
 		google.maps.event.trigger(map, 'resize');
-		trafmon.rotateTelemetry();
 	}
 
 	function showDialog(page) {
