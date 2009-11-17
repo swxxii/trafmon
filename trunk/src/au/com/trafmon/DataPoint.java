@@ -4,8 +4,21 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+/**
+ * 
+ * This class represents a data point received from a client.
+ * 
+ * @author schester
+ *
+ */
 public class DataPoint {
 	
+	/**
+	 * The enum Layer signifies the type of transport the user was on when the point was submitted.
+	 * 
+	 * @author schester
+	 *
+	 */
 	public enum Layer { CAR, PUBLIC }
 
 	private double lat;
@@ -17,7 +30,6 @@ public class DataPoint {
 	private Layer layer;
 
 	public DataPoint(double lat, double lng, int bearing, int speed, String tag, GregorianCalendar date, Layer layer) {
-		super();
 		this.lat = lat;
 		this.lng = lng;
 		this.bearing = bearing;
@@ -28,7 +40,6 @@ public class DataPoint {
 	}
 
 	public DataPoint(double lat, double lng, int bearing, int speed, String tag, Date date, Layer layer) {
-		super();
 		this.lat = lat;
 		this.lng = lng;
 		this.bearing = bearing;
@@ -43,8 +54,14 @@ public class DataPoint {
 		this.layer = layer;
 	}
 
-	public DataPoint() {
-		// TODO Auto-generated constructor stub
+	public DataPoint(DataPoint dp) {
+		this.lat = dp.lat;
+		this.lng = dp.lng;
+		this.bearing = dp.bearing;
+		this.speed = dp.speed;
+		this.tag = dp.tag;
+		this.cal = dp.cal;
+		this.layer = dp.layer;
 	}
 
 	public double getLat() {

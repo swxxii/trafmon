@@ -15,6 +15,7 @@ import com.db4o.query.Predicate;
 
 /**
  * Servlet implementation class Db4oServlet
+ * This class is my first attempt to use db4o!
  */
 public class Db4oServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

@@ -18,6 +18,12 @@ import com.db4o.ObjectContainer;
 
 /**
  * Servlet implementation class DataPointServlet
+ * 
+ * This servlet is the central one in the trafmon system. It handles all incoming requests that deal with DataPoints.
+ * These fall into two categories; requests for a set of points, and a request to store a point.
+ * Both are POST requests.
+ * 
+ * @author schester
  */
 public class DataPointServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -43,18 +49,18 @@ public class DataPointServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		//Need to set up db4o to handle java calendars properly.
 		Db4o.configure().objectClass(GregorianCalendar.class).callConstructor(true);
 
 
 
 		if (request.getParameter("lat") != null) {
-
+			// Here we have a post request to store a point
 			ObjectContainer db = Util.openDb();
 
 			try {
 
-				// Here we have a post request to store a point
-
+				//Set up the variables
 				double lat = Double.parseDouble(request.getParameter("lat"));
 				double lng = Double.parseDouble(request.getParameter("lng"));
 				int bearing = Integer.parseInt(request.getParameter("bearing"));
@@ -62,15 +68,15 @@ public class DataPointServlet extends HttpServlet {
 				String tag = request.getParameter("tag");
 				Layer layer = ( Integer.parseInt(request.getParameter("layer")) == 1 ) ? Layer.CAR : Layer.PUBLIC ;
 
+				//Make the data point
 				DataPoint newPoint = new DataPoint(lat, lng, bearing, speed, tag, new Date(), layer);
 
-				DataPointSet pointSet = new DataPointSet(newPoint);
-
+				//Store the data point
 				db.store(newPoint);
-
-				// Return the new point, why not!
+				
+				// Return the new point, so the client can verify it if they wish.
+				DataPointSet pointSet = new DataPointSet(newPoint);			
 				PrintWriter out = response.getWriter();
-
 				out.println(pointSet.toJSON());
 
 			} finally {
@@ -79,6 +85,8 @@ public class DataPointServlet extends HttpServlet {
 
 		} else if (request.getParameter("maxLat") != null) {
 			// Here we have a post request to return a number of points
+			
+			//Get the veriables that MUST be present
 			final Double maxLat = Double.parseDouble(request.getParameter("maxLat"));
 			final Double maxLng = Double.parseDouble(request.getParameter("maxLng"));
 			final Double minLat = Double.parseDouble(request.getParameter("minLat"));
@@ -136,6 +144,7 @@ public class DataPointServlet extends HttpServlet {
 				pointSet = DataPointService.getPointsByDate(maxLat, maxLng, minLat, minLng, date, layer);
 			}
 
+			//Return the JSON of the points
 			PrintWriter out = response.getWriter();
 
 			out.println(pointSet.toJSON());

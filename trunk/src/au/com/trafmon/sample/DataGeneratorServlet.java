@@ -19,6 +19,8 @@ import com.db4o.query.Predicate;
 
 /**
  * Servlet implementation class DataGenerator
+ * This servlet uses db4o to add points to a db.
+ * @author schester 
  */
 public class DataGeneratorServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

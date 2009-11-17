@@ -19,7 +19,9 @@ import au.com.trafmon.DataPointSet;
 import au.com.trafmon.Util;
 
 /**
- * Servlet implementation class DataGenerator
+ * Servlet implementation class SimpleTestServlet
+ * This servlet was another servlet to test my use of db4o
+ * @author schester
  */
 public class SimpleTestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

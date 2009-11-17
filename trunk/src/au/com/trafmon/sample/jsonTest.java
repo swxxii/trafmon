@@ -1,14 +1,20 @@
-package au.com.trafmon;
+package au.com.trafmon.sample;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import au.com.trafmon.DataPoint;
+import au.com.trafmon.DataPointSet;
 import au.com.trafmon.DataPoint.Layer;
 
 public class jsonTest {
 
 	/**
+	 * 
+	 * This class was written to test the toJSON method in DataPointSet
+	 * 
+	 * @author schester
 	 * @param args
 	 */
 	public static void main(String[] args) {
