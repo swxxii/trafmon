@@ -357,7 +357,7 @@ trafmon = {
 	 *            acc
 	 */
 	updateTelemetry : function(speed, bearing, acc) {
-		setVal('tel_speed', Math.round(speed) + ' km/h');
+		setVal('tel_speed', Math.round(speed)+' km/h');
 		setVal('tel_bearing', Math.round(bearing) + ' &deg;');
 		setVal('tel_acc', Math.round(acc) + ' m');
 	},
