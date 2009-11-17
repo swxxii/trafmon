@@ -84,3 +84,12 @@ div.trafficmarker {
 .sstable img {
 	border: 1px solid black;
 }
+#telemetry {
+	border: 1px solid black;
+	position: relative;
+	padding: 2px;
+	width: 100px;
+	background: #fff;
+	font-size: 8px;
+	text-align: left;
+}
