@@ -30,6 +30,7 @@ function setVal(id, val) {
 		case 'DIV' :
 		case 'TEXTAREA' :
 		case 'A' :
+		case 'TD':
 			elem.innerHTML = val;
 			return true;
 		case 'INPUT' :
@@ -51,6 +52,7 @@ function getVal(id) {
 		case 'DIV' :
 		case 'TEXTAREA' :
 		case 'A' :
+		case 'TD':
 			return elem.innerHTML;
 		case 'INPUT' :
 			return elem.value;

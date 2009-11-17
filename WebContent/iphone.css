@@ -33,3 +33,13 @@ div.trafficmarker {
 	filter: alpha(opacity = 75);
 	opacity: 0.75;
 }
+
+#telemetry {
+	border: 1px solid black;
+	position: relative;
+	padding: 2px;
+	width: 100px;
+	background: #fff;
+	font-size: 11px;
+	text-align: left;
+}

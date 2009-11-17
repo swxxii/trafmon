@@ -296,6 +296,7 @@
 		setTimeout(scrollTo, 100, 0, 1);
 		// trafmon- resize map div
 		google.maps.event.trigger(map, 'resize');
+		trafmon.rotateTelemetry();
 	}
 
 	function showDialog(page) {
@@ -370,7 +371,7 @@
 		if (page.id == "map_canvas") {
 			// create the map if not yet created
 			if (!map) {
-				trafmon.init_map();
+				trafmon.phoneInit();
 			}
 			// redraw map (fairly hefty delay to give map a chance to load)
 			setTimeout(trafmon.mapPageShown, 1500);

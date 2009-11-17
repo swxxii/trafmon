@@ -33,6 +33,12 @@ trafmon = {
 	MAP_CENTERED_ONCE : false,
 	CHECKIN_DELAY_MILLIS : 10000,
 
+	/*
+	 * Keep track of which version are we running (set later by init methods)
+	 */
+	onDesktop : false,
+	onPhone : false,
+
 	/***************************************************************************
 	 * Class Variables
 	 **************************************************************************/
@@ -86,6 +92,9 @@ trafmon = {
 
 	// store the list of markers (TrafficMarker objects)
 	markers : [],
+
+	// variables for the telemetry window node
+	telemetryDrawn : false,
 
 	/***************************************************************************
 	 * TrafMon Options (defaults here, changed by GUI)
@@ -147,7 +156,7 @@ trafmon = {
 	toggleShowPub : function(desktop) {
 		if (desktop) {
 			trafmon.options.showPubPoints = isChecked('show_public');
-			alert(trafmon.options.showPubPoints);
+			// alert(trafmon.options.showPubPoints);
 		} else {
 			elem = document.getElementById('show_pub');
 			toggled = elem.getAttribute('toggled')
@@ -195,7 +204,7 @@ trafmon = {
 	setDayOptDesktop : function() {
 		val = getVal('day');
 		trafmon.options.dayOfWeek = val;
-		alert(trafmon.options.dayOfWeek);
+		// alert(trafmon.options.dayOfWeek);
 		// if select 'live traffic' (0), disable the timerange dropdown
 		if (val == 0) {
 			ableElement('timerange', false);
@@ -240,7 +249,7 @@ trafmon = {
 	 */
 	setTimeOptDesktop : function() {
 		trafmon.options.timeRange = getVal('timerange');
-		alert(trafmon.options.timeRange);
+		// alert(trafmon.options.timeRange);
 		// trigger map to reload points as option changed
 		google.maps.event.trigger(map, 'idle');
 	},
@@ -250,9 +259,10 @@ trafmon = {
 	 **************************************************************************/
 
 	/**
-	 * Initialize the google maps api
+	 * Initialize the Google Maps API (on iPhone)
 	 */
-	init_map : function() {
+	phoneInit : function() {
+		trafmon.onPhone = true;
 		// set location
 		trafmon.initPosition();
 		// do browser detection
@@ -264,6 +274,8 @@ trafmon = {
 	 * Initialize the google maps api (desktop version)
 	 */
 	desktopInit : function() {
+		trafmon.onDesktop = true;
+		trafmon.telemetryDrawn = false;
 		// redirect iphone clients
 		// iPhoneRedirect('iphone.html');
 		// get map options object
@@ -286,42 +298,96 @@ trafmon = {
 	 * Called when user clicks "start" and map page is shown
 	 */
 	mapPageShown : function() {
+		trafmon.onPhone = true;
 		// resize the map so it draws
 		google.maps.event.trigger(map, 'resize');
 		// start watching position
 		trafmon.watchPosition();
-
 		// finished initialisation
 		trafmon.commonMain();
 
 	},
 
 	/***************************************************************************
-	 * Common Main Method:
-	 * 
-	 * runs on both iPhone and desktop versions once each initialised
-	 * 
+	 * Common Main Method: runs on both iPhone and desktop versions once each
+	 * has been initialised in their own way
 	 **************************************************************************/
 	commonMain : function() {
 		// turn on event listeners
 		trafmon.setListeners();
 		trafmon.checkInLocation('DataPointServlet', 44, 33, 22, 11, 'tag');
+
+		if (trafmon.onPhone) {
+			setTimeout(trafmon.drawTelemetry, 1000);
+		}
+
 	},
 
 	/**
-	 * GMaps API Event Listeners
+	 * Initialises the telemetry panel
 	 */
+	drawTelemetry : function() {
+		canvas = document.getElementById('map_canvas');
+		tel = document.createElement('table');
+		tel.setAttribute('id', 'telemetry');
+
+		tel.style.left = parseInt(canvas.clientWidth) - 105 + 'px';
+		tel.style.top = '28px';
+
+		tel.innerHTML = '<tr><td colspan="2"><b>Telemetry</b></td></tr>'
+				+ '<tr><td>Speed</td><td id="tel_speed">n/a</td></tr>'
+				+ '<tr><td>Heading</td><td id="tel_bearing">n/a</td></tr>'
+				+ '<tr><td>Accuracy</td><td id="tel_acc">n/a</td></tr>';
+
+		// finally append the element to map canvas (once only)
+		if (!trafmon.telemetryDrawn) {
+			canvas.appendChild(tel);
+			trafmon.telemetryDrawn = true;
+		}
+	},
+
+	/**
+	 * Updates all telemetry fields by setting the content of the TD's
+	 * 
+	 * @param {}
+	 *            speed
+	 * @param {}
+	 *            bearing
+	 * @param {}
+	 *            acc
+	 */
+	updateTelemetry : function(speed, bearing, acc) {
+		setVal('tel_speed', Math.round(speed) + ' km/h');
+		setVal('tel_bearing', Math.round(bearing) + ' &deg;');
+		setVal('tel_acc', Math.round(acc) + ' m');
+	},
+
+	/**
+	 * updates position of telemetry when phone rotated.
+	 */
+	rotateTelemetry : function() {
+		if (!trafmon.onPhone)
+			return;
+		elem = document.getElementById('telemetry');
+		elem.style.left = parseInt(canvas.clientWidth) - 105 + 'px';
+	},
+
+	/***************************************************************************
+	 * Install the GMaps API Event Listeners
+	 **************************************************************************/
 	setListeners : function() {
 		// if for some reason, map is null, abort
 		if (!map)
 			return false;
 
 		/*
-		 * Click event: user clicks anywhere on the map
+		 * Click event: user clicks anywhere on the map (disabled - was for
+		 * debug but may use in future)
+		 * 
+		 * google.maps.event.addListener(map, 'click', function(event) {
+		 * trafmon.listenerClick(event); });
 		 */
-		google.maps.event.addListener(map, 'click', function(event) {
-					trafmon.listenerClick(event);
-				});
+
 		/*
 		 * Bounds-changed
 		 * 
@@ -356,7 +422,6 @@ trafmon = {
 	 *            event: google.maps.MouseClick event
 	 */
 	listenerClick : function(event) {
-		return;
 		point = event.latLng;
 		// alert(point);
 		d = getVal('search');
@@ -464,7 +529,7 @@ trafmon = {
 
 		// only want to run every X seconds
 		// TODO extract time delay as constant
-		if ((timeDifference) >= 20000) {
+		if ((timeDifference) >= 5000) {
 
 			// alert(trafmon.previousPosition.coords.latitude + '\n'
 			// + position.coords.latitude);
@@ -476,13 +541,15 @@ trafmon = {
 				var bearing = trafmon.calculateBearing(position,
 						trafmon.prevPosition);
 
-				alert('checkin here\nspeed=' + speed + "\nbear="
-						+ bearing + '\nacc=' + position.coords.accuracy);
+				// display telemetry on map GUI
+				trafmon.updateTelemetry(speed, bearing,
+						position.coords.accuracy)
 
-				// trafmon.checkInLocation("./DataPointServlet",
-				// trafmon.currPosition.coords.latitude,
-				// trafmon.currPosition.coords.longitude,
-				// bearing, speed, trafmon.options.locationTag);
+				trafmon.checkInLocation("./DataPointServlet",
+						trafmon.currPosition.coords.latitude,
+						trafmon.currPosition.coords.longitude, Math
+								.floor(bearing), Math.round(speed),
+						trafmon.options.locationTag);
 			}
 
 			// reset time counter
@@ -1029,3 +1096,28 @@ TrafficMarker.prototype.onRemove = function() {
 TrafficMarker.prototype.getPosition = function() {
 	return this.latlng_;
 };
+function TrafficMarker(data, map) {
+	// get position out of data object & set LatLng
+	this.latlng_ = new google.maps.LatLng(data.lat, data.lng);
+	// default image dimensions
+	this.imgDim_ = 16;
+	// has this been appended to the DOM? (efficiency)
+	this.domAppend_ = false;
+
+	// if data point is the user location beacon and not a traffic point
+	if (data.own) {
+		this.image_ = trafmon.IMAGE_BASE_URL + 'beacon.png';
+		this.tagged_ = false;
+		this.imgDim_ = 17;
+		// else its a normal triangle marker
+	} else {
+		this.image_ = trafmon.getMarkerImage(data.bearing, data.speed);
+		this.tagged_ = data.tagged;
+	}
+
+	// disable clicking and dragging (TODO: how?)
+
+	// Once the LatLng and text are set, add the overlay to the map. This will
+	// trigger a call to panes_changed which should in turn call draw.
+	this.setMap(map);
+}
