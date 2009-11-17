@@ -357,7 +357,7 @@ trafmon = {
 	 *            acc
 	 */
 	updateTelemetry : function(speed, bearing, acc) {
-		setVal('tel_speed', Math.round(speed)+' km/h');
+		setVal('tel_speed', Math.round(speed) + ' km/h');
 		setVal('tel_bearing', Math.round(bearing) + ' &deg;');
 		setVal('tel_acc', Math.round(acc) + ' m');
 	},
@@ -546,11 +546,14 @@ trafmon = {
 				trafmon.updateTelemetry(speed, bearing,
 						position.coords.accuracy)
 
-				trafmon.checkInLocation("./DataPointServlet",
-						trafmon.currPosition.coords.latitude,
-						trafmon.currPosition.coords.longitude, Math
-								.floor(bearing), Math.round(speed),
-						trafmon.options.locationTag);
+				// only check in if user has enabled
+				if (trafmon.options.reportLocation) {
+					trafmon.checkInLocation("./DataPointServlet",
+							trafmon.currPosition.coords.latitude,
+							trafmon.currPosition.coords.longitude, Math
+									.floor(bearing), Math.round(speed),
+							trafmon.options.locationTag);
+				}
 			}
 
 			// reset time counter
