@@ -41,16 +41,6 @@
   </servlet-mapping>
   <servlet>
     <description></description>
-    <display-name>CopyOfDb4oServlet</display-name>
-    <servlet-name>CopyOfDb4oServlet</servlet-name>
-    <servlet-class>au.com.trafmon.sample.CopyOfDb4oServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>CopyOfDb4oServlet</servlet-name>
-    <url-pattern>/CopyOfDb4oServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
     <display-name>DataGenerator</display-name>
     <servlet-name>DataGenerator</servlet-name>
     <servlet-class>au.com.trafmon.sample.DataGenerator</servlet-class>
