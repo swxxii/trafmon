@@ -4,6 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * 
+ * This class represents a set of data points, generally one that is going to be returned to the client
+ * 
+ * @author schester
+ *
+ */
 public class DataPointSet {
 	
 	private List<DataPoint> dataPoints;
@@ -22,6 +29,12 @@ public class DataPointSet {
 		this.dataPoints.addAll(dataPoints);
 	}
 	
+	/**
+	 * 
+	 * This method returns a JSON string containing all of the data points in the set in a format that is accepted by the client.
+	 * 
+	 * @return The JSON representation of the data point set
+	 */
 	public String toJSON(){
 		String json = "[";
 		

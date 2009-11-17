@@ -1,5 +1,10 @@
 package au.com.trafmon.sample;
 
+/**
+ * A simple class to use with my attempts to get db4o working
+ * @author schester
+ *
+ */
 public class Pilot {    
     private String name;
     private int points;  

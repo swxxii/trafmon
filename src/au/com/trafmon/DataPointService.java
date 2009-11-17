@@ -11,11 +11,19 @@ import au.com.trafmon.DataPoint.Layer;
 import com.db4o.ObjectContainer;
 import com.db4o.query.Predicate;
 
+/**
+ * 
+ * This class is the db4o service for data points; it handles all database requests involving data points.
+ * 
+ * @author schester
+ *
+ */
 public class DataPointService {
 	
 	/**
 	 * This method returns all points on a given day of the week during a given hour
-	 * within the given bounds
+	 * within the given bounds and on the specified layer
+	 * 
 	 * @param maxLat
 	 * @param maxLng
 	 * @param minLat
@@ -34,12 +42,13 @@ public class DataPointService {
 		ObjectContainer db = Util.openDb();
 
 		try {
+			// All of the following queries follow the same structure as this one;
+			// it cycles through all the points, and adds to the List<DataPoints> those for which the match method returns true
 			List<DataPoint> dataPoints = db.query(new Predicate<DataPoint>() {
 				public boolean match(DataPoint candidate) {
 					GregorianCalendar curCal = candidate.getCal();
-					// Check we are within the bounds specified, and within the hour specified.
-					// Currently this will get all points, for example, that were made on a Tuesday at 4pm within the given bounds
-					// It will NOT get all points that, for example, were made on the 4th of July 2008 between 4pm and 4:05pm within the given bounds
+					
+					
 					if ( candidate.getLat() <= maxLat 
 					  && candidate.getLat() >= minLat 
 					  && candidate.getLng() <= maxLng 
@@ -58,14 +67,9 @@ public class DataPointService {
 
 			DataPointSet pointsSet = new DataPointSet();
 			
+			//Copy the point into a new point, we dont want to need db4o later on when we refer to the point
 			for(DataPoint dp : dataPoints){
-				DataPoint dataPoint = new DataPoint();
-				dataPoint.setBearing(dp.getBearing());
-				dataPoint.setCal(dp.getCal());
-				dataPoint.setLat(dp.getLat());
-				dataPoint.setLng(dp.getLng());
-				dataPoint.setSpeed(dp.getSpeed());
-				dataPoint.setTag(dp.getTag());
+				DataPoint dataPoint = new DataPoint(dp);
 				pointsSet.addDataPoint(dataPoint);
 			}
 
@@ -76,7 +80,8 @@ public class DataPointService {
 	}
 	
 	/**
-	 * This method returns all points on a given day of the week during the specified timerange
+	 * This method returns all points on a given day of the week during the specified timerange and on the specified layer
+	 * 
 	 * @param maxLat
 	 * @param maxLng
 	 * @param minLat
@@ -92,7 +97,7 @@ public class DataPointService {
 			List<DataPoint> dataPoints = db.query(new Predicate<DataPoint>() {
 				public boolean match(DataPoint candidate) {
 					GregorianCalendar curCal = candidate.getCal();
-					// Check we are within the bounds specified, and within the hour range specified
+					
 					if ( candidate.getLat() <= maxLat 
 					  && candidate.getLat() >= minLat 
 					  && candidate.getLng() <= maxLng 
@@ -112,13 +117,7 @@ public class DataPointService {
 			DataPointSet pointsSet = new DataPointSet();
 			
 			for(DataPoint dp : dataPoints){
-				DataPoint dataPoint = new DataPoint();
-				dataPoint.setBearing(dp.getBearing());
-				dataPoint.setCal(dp.getCal());
-				dataPoint.setLat(dp.getLat());
-				dataPoint.setLng(dp.getLng());
-				dataPoint.setSpeed(dp.getSpeed());
-				dataPoint.setTag(dp.getTag());
+				DataPoint dataPoint = new DataPoint(dp);
 				pointsSet.addDataPoint(dataPoint);
 			}
 
@@ -129,8 +128,8 @@ public class DataPointService {
 	}
 
 	/**
-	 * This method returns all points on a given date during a given hour
-	 * within the given bounds
+	 * This method returns all points on a given date within 30 mins prior to the request
+	 * within the given bounds and on the specified layer
 	 * @param maxLat
 	 * @param maxLng
 	 * @param minLat
@@ -155,8 +154,6 @@ public class DataPointService {
 					
 					int year = curCal.get(Calendar.YEAR);
 					
-					// Check we are within the bounds specified, and within the hour specified.
-					// Currently this will get all points, for example, that were made today within 30mins of the current time
 					if ( candidate.getLat() <= maxLat 
 					  && candidate.getLat() >= minLat 
 					  && candidate.getLng() <= maxLng 
@@ -178,13 +175,7 @@ public class DataPointService {
 			DataPointSet pointsSet = new DataPointSet();
 
 			for(DataPoint dp : dataPoints){
-				DataPoint dataPoint = new DataPoint();
-				dataPoint.setBearing(dp.getBearing());
-				dataPoint.setCal(dp.getCal());
-				dataPoint.setLat(dp.getLat());
-				dataPoint.setLng(dp.getLng());
-				dataPoint.setSpeed(dp.getSpeed());
-				dataPoint.setTag(dp.getTag());
+				DataPoint dataPoint = new DataPoint(dp);
 				pointsSet.addDataPoint(dataPoint);
 			}
 
@@ -212,7 +203,6 @@ public class DataPointService {
 		try {
 			List<DataPoint> dataPoints = db.query(new Predicate<DataPoint>() {
 				public boolean match(DataPoint candidate) {
-					// Check we are within the bounds specified
 					if ( candidate.getLat() <= maxLat 
 					  && candidate.getLat() >= minLat 
 					  && candidate.getLng() <= maxLng 
@@ -229,13 +219,7 @@ public class DataPointService {
 			DataPointSet pointsSet = new DataPointSet();
 			
 			for(DataPoint dp : dataPoints){
-				DataPoint dataPoint = new DataPoint();
-				dataPoint.setBearing(dp.getBearing());
-				dataPoint.setCal(dp.getCal());
-				dataPoint.setLat(dp.getLat());
-				dataPoint.setLng(dp.getLng());
-				dataPoint.setSpeed(dp.getSpeed());
-				dataPoint.setTag(dp.getTag());
+				DataPoint dataPoint = new DataPoint(dp);
 				pointsSet.addDataPoint(dataPoint);
 			}
 

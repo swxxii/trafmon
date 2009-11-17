@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Servlet implementation class SnoopServlet
+ * A servlet I downloaded to see how it all works
  */
 public class SnoopServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
