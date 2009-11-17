@@ -19,39 +19,65 @@ var map = false;
 trafmon = {
 
 	/***************************************************************************
-	 * Constants/Defaults
+	 * Class Constants
 	 **************************************************************************/
 
-	// Default map location (if geolocation fails)
-	DEFAULT_LAT : -37.798985,
-	DEFAULT_LONG : 144.964685,
+	/*
+	 * Default application options (non-user configurable)
+	 */
+
 	DEFAULT_ZOOM : 15,
 	DEFAULT_ZOOM_SUCCESS : 15,
 	DEFAULT_NAVI_CONTROL : google.maps.NavigationControlStyle.ANDROID,
 	IMAGE_BASE_URL : 'images/',
 	MAP_CENTERED_ONCE : false,
+	CHECKIN_DELAY_MILLIS : 10000,
 
 	/***************************************************************************
 	 * Class Variables
 	 **************************************************************************/
 
-	// Initialise the default position. this is designed to replicate structure
-	// of position recieved from geolocation API.
-	// this does not like being initialised with variables hence the hard coding
-	position : {
+	/*
+	 * Initialise the default position. This object designed to replicate
+	 * structure of position recieved from geolocation API. This means you need
+	 * to use the position.coords.latitude to get at the coordinates
+	 * 
+	 * This does not like being initialised with variables hence the hard coding
+	 * current position (where we are now).
+	 * 
+	 * Default coords are near ICT.
+	 */
+	defaultPosition : {
 		coords : {
 			latitude : -37.798985,
 			longitude : 144.964685
 		}
 	},
-
-	previousPosition : {
+	/*
+	 * Place to store CURRENT position once retrieved from API
+	 */
+	currPosition : {
 		coords : {
-			latitude : -37.798985,
-			longitude : 144.964685
+			latitude : null,
+			longitude : null
 		}
 	},
+	// has the position been set by geolocation?
+	currPositionUpdated : false,
 
+	/*
+	 * Place to store PREVIOUS position once retrieved from API
+	 */
+	prevPosition : {
+		coords : {
+			latitude : null,
+			longitude : null
+		}
+	},
+	// has the position been set by geolocation?
+	prevPositionUpdated : false,
+
+	// what was the last time we calculated speed/bearing? (init to now)
 	previousTime : (new Date()).getTime(),
 
 	// marker for user's position
@@ -173,7 +199,7 @@ trafmon = {
 		// if select 'live traffic' (0), disable the timerange dropdown
 		if (val == 0) {
 			ableElement('timerange', false);
-			setSelect('timerange',-1);
+			setSelect('timerange', -1);
 			trafmon.options.timeRange = -1;
 		}
 		// if select day, enable timerange dropdown
@@ -359,15 +385,15 @@ trafmon = {
 	 * Init Position success : Creates a GMap with current position
 	 */
 	initPositionSuccess : function(position) {
-		// store position internally to allow referencing by other methods
+		// store current position internally
 		trafmon.setPosition(position);
 		// get map options object
 		var mapopts = trafmon.getMapOptions(false);
 		// instantiate the map
 		map = new google.maps.Map(document.getElementById("map_canvas"),
 				mapopts);
-		// center map
-		map.set_center(trafmon.getPositionLatLng());
+		// center map on current position
+		map.set_center(trafmon.positionToLatLng(trafmon.currPosition));
 
 		// finished initialisation
 		trafmon.commonMain();
@@ -377,14 +403,13 @@ trafmon = {
 	 * Init Position fail : Creates a GMap with defaults
 	 */
 	initPositionFail : function(position) {
-		// store position internally to allow referencing by other methods
-		trafmon.setPosition(position);
-		// get map options object
+		// get map options object with defaults
 		var mapopts = trafmon.getMapOptions(true);
 		// instantiate the map
 		map = new google.maps.Map(document.getElementById("map_canvas"),
 				mapopts);
-		map.set_center(trafmon.getPositionLatLng());
+		// center map on current position
+		map.set_center(trafmon.getDefaultPositionLatLng());
 
 		// finished initialisation
 		trafmon.commonMain();
@@ -406,59 +431,88 @@ trafmon = {
 	 */
 	watchPositionSuccess : function(position) {
 
-		// update internal position object with new position
+		/*
+		 * UPDATE POSITION & USER MARKER
+		 */
+
+		// store position
 		trafmon.setPosition(position);
-		// redraw the user position marker (every time)
+		// redraw user beacon marker (every time)
 		trafmon.updateUserMarker();
+		// center map at current position ONCE at startup
+		if (!trafmon.MAP_CENTERED_ONCE) {
+			map.set_center(trafmon.positionToLatLng(trafmon.currPosition));
+			trafmon.MAP_CENTERED_ONCE = true;
+		}
 
 		/*
 		 * SPEED AND BEARING CALCULATIONS
+		 * 
+		 * Note: there are built-in properties for speed and bearing (heading)
+		 * in the W3C geolocation API, however it is not mandatory to include
+		 * these in all implementations. Hence, we have decided to implement our
+		 * own calculations.
+		 * 
+		 * See this URL for more info
+		 * http://dev.w3.org/geo/api/spec-source.html#position_interface
 		 */
 
+		// calculate time difference
 		var d = new Date();
 		var currentTime = d.getTime();
 		var timeDifference = currentTime - trafmon.previousTime;
 
 		// only want to run every X seconds
-		// if ((timeDifference) >= trafmon.MILLIS_BETWEEN_CHECKIN) {
-		if ((timeDifference) >= 6000) {
+		// TODO extract time delay as constant
+		if ((timeDifference) >= 20000) {
 
-			// alert(trafmon.previousPosition + '\n'+position);
+			// alert(trafmon.previousPosition.coords.latitude + '\n'
+			// + position.coords.latitude);
 
-			// calc speed & bearing
-			var speed = trafmon.calculateSpeed(position,
-					trafmon.previousPosition, timeDifference);
-			var bearing = trafmon.calculateBearing(position,
-					trafmon.previousPosition);
+			// calculate speed and bearing ONLY IF we have set prevPosition
+			if (trafmon.prevPositionUpdated) {
+				var speed = trafmon.calculateSpeed(position,
+						trafmon.prevPosition, timeDifference);
+				var bearing = trafmon.calculateBearing(position,
+						trafmon.prevPosition);
 
-			alert(speed + "\n" + bearing);
+				alert('checkin here\nspeed=' + speed + "\nbear="
+						+ bearing + '\nacc=' + position.coords.accuracy);
+
+				// trafmon.checkInLocation("./DataPointServlet",
+				// trafmon.currPosition.coords.latitude,
+				// trafmon.currPosition.coords.longitude,
+				// bearing, speed, trafmon.options.locationTag);
+			}
 
 			// reset time counter
 			trafmon.previousTime = currentTime;
-			// reset 'position X seconds ago' to current position
-			trafmon.setPrevPosition(trafmon.position);
+			// update previous position
+			trafmon.setPrevPosition(trafmon.currPosition);
 
-			// trafmon.checkInLocation("./DataPointServlet",
-			// trafmon.position.latitude, trafmon.position.longitude,
-			// bearing, speed, trafmon.options.locationTag);
-
-		}
-
-		// center map ONCE at startup
-		if (!trafmon.MAP_CENTERED_ONCE) {
-			map.set_center(trafmon.getPositionLatLng());
-			trafmon.MAP_CENTERED_ONCE = true;
 		}
 
 	},
 
+	/**
+	 * Calculates speed in km/h over 2 points and a time difference. Adapted
+	 * from http://www.movable-type.co.uk/scripts/latlong.html
+	 * 
+	 * @param {}
+	 *            position: current position
+	 * @param {}
+	 *            oldPosition: old position
+	 * @param {}
+	 *            timeDif: time difference in milliseconds
+	 * @return {} speed in km/h
+	 */
 	calculateSpeed : function(position, oldPosition, timeDif) {
 		// lat 1 has to be old position
-		var lat1 = oldPosition.latitude;
-		var lon1 = oldPosition.longitude;
+		var lat1 = oldPosition.coords.latitude;
+		var lon1 = oldPosition.coords.longitude;
 		// lat2 has to be current (new) position
-		var lat2 = position.latitude;
-		var lon2 = position.longitude;
+		var lat2 = position.coords.latitude;
+		var lon2 = position.coords.longitude;
 		// calculate individual distances
 		var dLat = toRad(lat2 - lat1);
 		var dLon = toRad(lon2 - lon1);
@@ -478,11 +532,21 @@ trafmon = {
 
 	},
 
+	/**
+	 * Calculates bearing (in degrees) given two positions. Adapted from
+	 * http://www.movable-type.co.uk/scripts/latlong.html
+	 * 
+	 * @param {}
+	 *            position: current position
+	 * @param {}
+	 *            oldPosition: previous position
+	 * @return {} bearing in degrees (0-359.999)
+	 */
 	calculateBearing : function(position, oldPosition) {
-		var lat1 = oldPosition.latitude;
-		var lon1 = oldPosition.longitude;
-		var lat2 = position.latitude;
-		var lon2 = position.longitude;
+		var lat1 = oldPosition.coords.latitude;
+		var lon1 = oldPosition.coords.longitude;
+		var lat2 = position.coords.latitude;
+		var lon2 = position.coords.longitude;
 		var dLat = toRad(lat2 - lat1);
 		var dLon = toRad(lon2 - lon1);
 
@@ -543,7 +607,7 @@ trafmon = {
 		// center map view on every pass (this is annoying and should be
 		// user-triggered with a button)
 		if (!trafmon.FIRST_CENTER) {
-			map.set_center(trafmon.getPositionLatLng());
+			map.set_center(trafmon.positionToLatLng(trafmon.currPosition));
 			trafmon.FIRST_CENTER = true;
 		}
 	},
@@ -780,28 +844,24 @@ trafmon = {
 	 **************************************************************************/
 
 	/**
-	 * Set the position given a position object from the geolocation API
+	 * Set the current and prev positions given new position object from
+	 * geolocation API
 	 */
 	setPosition : function(position) {
-		trafmon.position = position;
+		trafmon.currPosition = position;
+		trafmon.currPositionUpdated = true;
 	},
 	setPrevPosition : function(position) {
-		trafmon.previousPosition = position;
+		trafmon.prevPosition = position;
+		trafmon.prevPositionUpdated = true;
 	},
 
-	// /**
-	// * Set the position given a position object from the geolocation API
-	// */
-	// setPreviousPosition : function(position) {
-	// trafmon.previousposition = position;
-	// },
-
 	/**
-	 * Returns the internal position as a Google Maps LatLng object
+	 * Converts a Geolocation API position object to Google Maps LatLng object
 	 */
-	getPositionLatLng : function() {
-		return new google.maps.LatLng(trafmon.position.coords.latitude,
-				trafmon.position.coords.longitude);
+	positionToLatLng : function(position) {
+		return new google.maps.LatLng(position.coords.latitude,
+				position.coords.longitude);
 	},
 
 	/**
@@ -812,8 +872,8 @@ trafmon = {
 	getUserDataPoint : function() {
 		data = {
 			own : true,
-			lat : trafmon.position.coords.latitude,
-			lng : trafmon.position.coords.longitude
+			lat : trafmon.currPosition.coords.latitude,
+			lng : trafmon.currPosition.coords.longitude
 		};
 		return data;
 	},
@@ -822,16 +882,15 @@ trafmon = {
 	 * Get map options : a wrapper to get the map options neatly
 	 * 
 	 * @param {}
-	 *            use_defaults True if you want to use defaults, False if you
-	 *            want to use position
+	 *            use_defaults: true if you want to use defaults, false if you
+	 *            want to use actual position
 	 */
 	getMapOptions : function(use_defaults) {
 		if (use_defaults) {
 			return {
 				// required params
 				mapTypeId : google.maps.MapTypeId.ROADMAP,
-				center : new google.maps.LatLng(trafmon.DEFAULT_LAT,
-						trafmon.DEFAULT_LONG),
+				center : trafmon.positionToLatLng(trafmon.defaultPosition),
 				zoom : trafmon.DEFAULT_ZOOM,
 
 				// optional params
@@ -848,9 +907,7 @@ trafmon = {
 		} else
 			return {
 				mapTypeId : google.maps.MapTypeId.ROADMAP,
-				center : new google.maps.LatLng(
-						trafmon.position.coords.latitude,
-						trafmon.position.coords.longitude),
+				center : trafmon.positionToLatLng(trafmon.currPosition),
 				zoom : trafmon.DEFAULT_ZOOM_SUCCESS,
 				navigationControl : true,
 				navigationControlOptions : {
